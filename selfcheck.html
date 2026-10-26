@@ -75,6 +75,8 @@ th{background:#eef2f6;font-size:13px}
 td.l{text-align:left}
 .st-ok{color:var(--ok);font-weight:800}.st-no{color:var(--red)}
 .mini{font-size:12px;color:var(--muted)}
+.resume{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--acc);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.65;margin:0 0 10px}
+.resume span{display:block;color:var(--sub);font-size:13px}
 .drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;background:#fff}
 @media (max-width:560px){.steps3{grid-template-columns:1fr}.top .who{margin-left:0;width:100%}}
 </style>
@@ -131,7 +133,8 @@ function home(){
     <div class="err" id="err"></div>
     <div id="roles" class="roles"></div>
     <div style="margin-top:14px"><button class="btn pri" id="go">확인</button></div></div>
-  <p class="mini" style="text-align:center">집중 점검 기간 2026.12.14.~12.23. · 같은 반·같은 차수를 다시 제출하면 마지막 제출로 바뀌어요.</p>
+  <div class="resume">💾 <b>중간에 나갔다 다시 들어와도 이어서 할 수 있어요.</b> 같은 기기·같은 브라우저에서 같은 반·차수로 들어오면 체크한 ○가 그대로 남아 있어요. <span>손글씨 서명은 남지 않으니 제출 전에 다시 써 주세요. 다른 기기로 바꾸면 처음부터 해야 해요.</span></div>
+  <p class="mini" style="text-align:center">집중 점검 기간 2026.12.14.~12.23. · <b>제출 마감 12/23(수) 16:50(퇴청 전)</b> · 같은 반·같은 차수를 다시 제출하면 마지막 제출로 바뀌어요.</p>
   <div style="text-align:center;margin-top:20px"><button class="btn sm" id="adm" style="color:var(--sub)">🔧 담당자 수합·PDF 만들기</button></div>`;
   const go = () => {
     const name = $('#n').value.trim();
@@ -184,7 +187,7 @@ function openCheck(){
   app.innerHTML = `
     ${S.preview?'<div class="note" style="margin-bottom:12px">🔧 <b>관리자 미리보기</b> — 이 화면에서 제출해도 시트로 보내지 않아요.</div>':''}
     <div class="box"><div class="guide">점검자: <b>1검 ${esc(a.t[0])}</b>(담임) · <b>2검 ${esc(a.t[1])}</b>(인접 담임) · <b>3검 ${esc(a.t[2])}</b>(부담임)<br>
-      학교생활기록부Ⅱ 출력물을 보며 문항을 확인하고, 문제가 없으면 <b>○</b>를 눌러요. 고칠 곳이 있으면 담임에게 알려 수정한 뒤 ○를 눌러요.</div></div>
+      학교생활기록부Ⅱ 출력물을 보며 문항을 확인하고, 문제가 없으면 <b>○</b>를 눌러요. 고칠 곳이 있으면 담임에게 알려 수정한 뒤 ○를 눌러요.<br><span class="mini">💾 ○는 누를 때마다 이 기기에 저장돼요. 같은 기기·같은 브라우저라면 나갔다 들어와도 이어서 할 수 있어요. (서명은 제출 전에 다시)</span></div></div>
     ${S.r===0?`<div class="box"><h3>표지 · 점검 항목 (생활기록부Ⅱ 출력) <span class="mini">담임만</span></h3><div class="cov">${COVER.map((c,i)=>`<label><input type="checkbox" data-cv="${i}" ${D.cover[i]?'checked':''}> ${c}</label>`).join('')}</div></div>`:''}
     <div class="prog"><div class="tx"><span>${ROLE[S.r]} 점검</span><span><b id="cnt">0</b> / ${ITEMS.length}</span></div><div class="bar"><i id="pbar"></i></div></div>
     <div id="items">${h}</div>
