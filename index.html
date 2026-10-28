@@ -1520,6 +1520,7 @@ const nowStr = () => { const d=new Date(); return `${d.getMonth()+1}/${d.getDate
 /* ---------- 첫 화면 ---------- */
 function home(){
   if(typeof flushPush==='function') flushPush();
+  if(typeof clearHere==='function') clearHere();
   state = { role:null }; ADMIN_DAY = null;
   app.innerHTML = `
   <div class="hero"><h2>2026학년도 2학기 생기부 체크리스트</h2><p>할 일에 맞는 체크리스트를 골라 주세요.</p></div>
@@ -1539,6 +1540,7 @@ function home(){
 
 function schoolHome(){
   if(typeof flushPush==='function') flushPush();
+  if(typeof clearHere==='function') clearHere();
   state = { role:null }; ADMIN_DAY = null; $('#who').classList.add('hidden');
   const last = store.get('sgb:last');
   app.innerHTML = `
@@ -1578,6 +1580,7 @@ function adminLogin(){
 
 function adminHub(){
   if(typeof flushPush==='function') flushPush();
+  if(typeof clearHere==='function') clearHere();
   state = { role:null }; ADMIN_DAY = null;
   $('#who').classList.remove('hidden');
   $('#who').innerHTML = `🔧 <b>관리자 미리보기</b> <button class="btn sm" id="out">나가기</button>`; $('#out').onclick = home;
@@ -1889,7 +1892,7 @@ function board(){
 }
 
 function selectDate(id, first){
-  const cards = cardsNow(); state.sel = id;
+  const cards = cardsNow(); state.sel = id; setTimeout(()=>{ if(typeof saveHere==='function') saveHere(); }, 600);
   cards.forEach(c=>{ const el=$('#card-'+c.id); if(el) el.classList.toggle('hidden', c.id!==id); });
   document.querySelectorAll('.chipd').forEach(b=>b.classList.toggle('sel', b.dataset.go===id));
   const i = cards.findIndex(c=>c.id===id);
@@ -2085,7 +2088,27 @@ function send(card, el){
 
 $('#lb').onclick = () => $('#lb').classList.remove('on');
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') $('#lb').classList.remove('on'); });
-(()=>{ let ok=false; try{ ok = new URLSearchParams(location.search).get('hub')==='1' && sessionStorage.getItem('sgb:adminok')==='1'; }catch(e){} ok ? adminHub() : home(); })();
+/* 새로고침해도 보던 자리 그대로: 들어온 사람·보던 날짜 카드·스크롤 위치를 이 탭(sessionStorage)에 기억해요.
+   [나가기]·[처음으로]를 누르면 지워져요. 탭을 닫으면 사라져요. */
+const HERE = 'sgb:here';
+function saveHere(){ try{ if(!state || !state.role){ sessionStorage.removeItem(HERE); return; }
+  sessionStorage.setItem(HERE, JSON.stringify({ st:state, day:ADMIN_DAY||null, y:Math.round(scrollY) })); }catch(e){} }
+function clearHere(){ try{ sessionStorage.removeItem(HERE); }catch(e){} }
+let hereT = 0; addEventListener('scroll', ()=>{ clearTimeout(hereT); hereT = setTimeout(saveHere, 200); }, {passive:true});
+addEventListener('pagehide', saveHere);
+try{ history.scrollRestoration = 'manual'; }catch(e){}
+function restoreHere(){
+  let h=null; try{ h = JSON.parse(sessionStorage.getItem(HERE)||'null'); }catch(e){}
+  if(!h || !h.st || !h.st.role) return false;
+  if(h.st.admin){ let ok=false; try{ ok = sessionStorage.getItem('sgb:adminok')==='1'; }catch(e){} if(!ok) return false; ADMIN_DAY = h.day||null; }
+  state = h.st; const sel = state.sel;
+  if(state.admin){ data = loadData(); board(); } else enter();
+  if(sel && document.getElementById('card-'+sel)) selectDate(sel, true);
+  const y = h.y||0; requestAnimationFrame(()=>requestAnimationFrame(()=>scrollTo(0, y)));
+  setTimeout(()=>scrollTo(0, y), 350);                         // 그림이 늦게 그려져 높이가 바뀌는 경우 한 번 더
+  return true;
+}
+(()=>{ if(restoreHere()) return; let ok=false; try{ ok = new URLSearchParams(location.search).get('hub')==='1' && sessionStorage.getItem('sgb:adminok')==='1'; }catch(e){} ok ? adminHub() : home(); })();
 
 /* =====================================================================
    🔍 항목 검색 — 오른쪽 위 '검색' 단추. 자격증·봉사처럼 낱말을 넣으면
