@@ -41,10 +41,15 @@ button,input,select,textarea{font:inherit;color:inherit}
 .rolebtn small{display:block;color:var(--sub);font-size:13px}
 .guide{background:var(--accbg);border-radius:10px;padding:10px 14px;font-size:14px;line-height:1.7}
 .note{background:var(--warnbg);border-left:4px solid #e0a800;border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.65}
-.prog{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0}
-.prog .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.prog{position:-webkit-sticky;position:sticky;top:0;z-index:20;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:0 0 12px;box-shadow:0 6px 18px rgba(24,32,46,.12)}
+.prog .tx .pct{font-weight:800;color:var(--acc);margin-left:6px}.prog .tx .left{margin-left:8px;font-size:13px}
+.prog .nx{border:1px solid var(--acc);background:#fff;color:var(--acc);border-radius:99px;padding:3px 10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;margin-left:10px}
+.prog .nx[hidden]{display:none}
+.item.flash{box-shadow:0 0 0 3px var(--acc)}
+.item{scroll-margin-top:90px}
+.prog .bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
 .prog .bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
-.prog .tx{display:flex;justify-content:space-between;font-size:14px;color:var(--sub);margin-bottom:6px}
+.prog .tx{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;font-size:14px;color:var(--sub);margin-bottom:8px}
 .prog .tx b{color:var(--ink)}
 .grp{margin:18px 0 8px;font-size:15px;font-weight:800;color:var(--acc)}
 .item{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
@@ -189,7 +194,7 @@ function openCheck(){
     <div class="box"><div class="guide">점검자: <b>1검 ${esc(a.t[0])}</b>(담임) · <b>2검 ${esc(a.t[1])}</b>(인접 담임) · <b>3검 ${esc(a.t[2])}</b>(부담임)<br>
       학교생활기록부Ⅱ 출력물을 보며 문항을 확인하고, 문제가 없으면 <b>○</b>를 눌러요. 고칠 곳이 있으면 담임에게 알려 수정한 뒤 ○를 눌러요.<br><span class="mini">💾 ○는 누를 때마다 이 기기에 저장돼요. 같은 기기·같은 브라우저라면 나갔다 들어와도 이어서 할 수 있어요. (서명은 제출 전에 다시)</span></div></div>
     ${S.r===0?`<div class="box"><h3>표지 · 점검 항목 (생활기록부Ⅱ 출력) <span class="mini">담임만</span></h3><div class="cov">${COVER.map((c,i)=>`<label><input type="checkbox" data-cv="${i}" ${D.cover[i]?'checked':''}> ${c}</label>`).join('')}</div></div>`:''}
-    <div class="prog"><div class="tx"><span>${ROLE[S.r]} 점검</span><span><b id="cnt">0</b> / ${ITEMS.length}</span></div><div class="bar"><i id="pbar"></i></div></div>
+    <div class="prog"><div class="tx"><span>📋 ${ROLE[S.r]} 점검 진행</span><span><b id="cnt">0</b> / ${ITEMS.length}<span class="pct" id="ppct">0%</span><span class="left" id="pleft"></span><button class="nx" id="pnext" type="button">▼ 안 한 문항</button></span></div><div class="bar"><i id="pbar"></i></div></div>
     <div id="items">${h}</div>
     <div class="box" style="margin-top:16px"><h3>서명</h3>
       <p class="mini" style="margin:0 0 10px">손가락이나 마우스로 써 주세요. 지원청 제출 서류의 서명란에 그대로 들어가요.</p>
@@ -214,7 +219,11 @@ function openCheck(){
   count(); window.scrollTo(0,0);
 }
 const save = () => store.set(keyOf(), D);
-function count(){ const n=ITEMS.filter(it=>D.items[it.id]).length; $('#cnt').textContent=n; $('#pbar').style.width=(n/ITEMS.length*100)+'%'; }
+function count(){ const n=ITEMS.filter(it=>D.items[it.id]).length, T=ITEMS.length; $('#cnt').textContent=n; $('#pbar').style.width=(n/T*100)+'%';
+  const pc=$('#ppct'); if(pc) pc.textContent=Math.round(n/T*100)+'%'; const lf=$('#pleft'); if(lf) lf.textContent = n<T ? `· 남은 ${T-n}개` : '· 모두 확인 ✅'; const nx=$('#pnext'); if(nx) nx.hidden = n>=T; }
+/* ‘안 한 문항’ 단추: 아직 ○를 누르지 않은 다음 문항으로 이동해요 (지금 보이는 곳 아래부터 찾아요) */
+document.addEventListener('click', e=>{ if(!e.target.closest('#pnext')) return; const its=[...document.querySelectorAll('#items .item')].filter(el=>!D.items[el.dataset.id]); if(!its.length) return;
+  const t = its.find(el=>el.getBoundingClientRect().top > 110) || its[0]; t.scrollIntoView({behavior:'smooth', block:'start'}); t.classList.add('flash'); setTimeout(()=>t.classList.remove('flash'), 1400); });
 
 /* ---------- 손글씨 서명 ---------- */
 const pads = {};
