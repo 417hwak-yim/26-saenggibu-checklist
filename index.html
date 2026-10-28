@@ -2108,7 +2108,11 @@ function restoreHere(){
   setTimeout(()=>scrollTo(0, y), 350);                         // 그림이 늦게 그려져 높이가 바뀌는 경우 한 번 더
   return true;
 }
-(()=>{ if(restoreHere()) return; let ok=false; try{ ok = new URLSearchParams(location.search).get('hub')==='1' && sessionStorage.getItem('sgb:adminok')==='1'; }catch(e){} ok ? adminHub() : home(); })();
+(()=>{ const q=new URLSearchParams(location.search); let ok=false; try{ ok = sessionStorage.getItem('sgb:adminok')==='1'; }catch(e){}
+  /* 바탕화면 '관리자' 바로가기: index.html?admin=1 → 비밀번호 입력 후 관리자 메뉴 */
+  if(restoreHere()) return;
+  if(q.get('admin')==='1'){ ok ? adminHub() : adminLogin(); return; }
+  (q.get('hub')==='1' && ok) ? adminHub() : home(); })();
 
 /* =====================================================================
    🔍 항목 검색 — 오른쪽 위 '검색' 단추. 자격증·봉사처럼 낱말을 넣으면
