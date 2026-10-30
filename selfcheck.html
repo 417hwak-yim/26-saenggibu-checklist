@@ -91,7 +91,7 @@ td.l{text-align:left}
 <body>
 <div class="wrap">
   <div class="top">
-    <div><a href="index.html" class="btn sm" style="text-decoration:none;display:inline-block;margin-bottom:8px">← 처음으로</a><div class="brand">신일비즈니스고등학교 · 2026학년도 2학기 · 2 · 지원청 제출 체크리스트</div><h1>📝 학교생활기록부Ⅱ 자체점검표</h1></div>
+    <div><a href="index.html" class="btn sm" style="text-decoration:none;display:inline-block;margin-bottom:8px">← 처음으로</a><div class="brand">신일비즈니스고등학교 · 2026학년도 2학기 · 2 · 교육지원청 제출용 체크리스트</div><h1>📝 학교생활기록부Ⅱ 자체점검표</h1></div>
     <div class="who hidden" id="who"></div>
   </div>
   <div id="app"></div>
@@ -144,8 +144,8 @@ function home(){
     <div class="err" id="err"></div>
     <div id="roles" class="roles"></div>
     <div style="margin-top:14px"><button class="btn pri" id="go">확인</button></div></div>
-  <div class="resume">💾 <b>중간에 나갔다 다시 들어와도 이어서 할 수 있어요.</b> 같은 기기·같은 브라우저에서 같은 반·차수로 들어오면 체크한 ○가 그대로 남아 있어요. <span>손글씨 서명은 남지 않으니 제출 전에 다시 써 주세요. 다른 기기로 바꾸면 처음부터 해야 해요.</span></div>
-  <p class="mini" style="text-align:center">집중 점검 기간 2026.12.14.~12.23. · <b>제출 마감 12/23(수) 16:50(퇴청 전)</b> · 같은 반·같은 차수를 다시 제출하면 마지막 제출로 바뀌어요.</p>
+  <div class="resume">☁️ <b>다른 기기에서 들어와도 이어서 할 수 있어요.</b> 같은 이름으로 같은 반·차수를 고르면 체크한 ○·표지 ∨·메모가 그대로 이어져요. <span>손글씨 서명은 남지 않으니 제출 전에 다시 써 주세요.</span></div>
+  <p class="mini" style="text-align:center">집중 점검 기간 2026.12.14.~12.23. · <b>12/16 집합점검일부터 12/23(수) 16:50 퇴청 전까지 반드시 제출</b> · 같은 반·같은 차수를 다시 제출하면 마지막 제출로 바뀌어요.</p>
   <div style="text-align:center;margin-top:20px"><button class="btn sm" id="adm" style="color:var(--sub)">🔧 담당자 수합·PDF 만들기</button></div>`;
   const go = () => {
     const name = $('#n').value.trim();
@@ -182,7 +182,9 @@ function previewPick(){
 /* ---------- 점검 화면 ---------- */
 const keyOf = () => `${S.preview?'jcp':'jc'}:${S.g}-${S.c}-${S.r}`;
 function openCheck(){
-  D = store.get(keyOf()) || { items:{}, cover:{}, memo:'' };
+  D = store.get(keyOf()) || { items:{}, cover:{}, memo:'', cv:2 };
+  /* 표지 항목이 8개 → 11개(학생부 항목별 출력)로 바뀌었어요. 예전 순서로 저장된 표지 ∨는 같은 항목 자리로 옮겨요 */
+  if(D.cover && !D.cv){ const MAP=[1,2,3,4,7,8,9,10], nc={}; Object.keys(D.cover).forEach(i=>{ if(D.cover[i] && MAP[+i]!=null) nc[MAP[+i]]=true; }); D.cover=nc; D.cv=2; store.set(keyOf(), D); }
   const a = ASSIGN.find(x=>x.g===S.g && x.c===S.c);
   $('#who').classList.remove('hidden');
   $('#who').innerHTML = `${S.preview?'🔧 <b>미리보기</b> · ':''}<b>${S.g}학년 ${S.c}반</b> · ${ROLE[S.r]} ${esc(S.name)} <button class="btn sm" id="out">${S.preview?'← 다른 반 보기':'나가기'}</button>`;
@@ -199,7 +201,7 @@ function openCheck(){
   app.innerHTML = `
     ${S.preview?'<div class="note" style="margin-bottom:12px">🔧 <b>관리자 미리보기</b> — 이 화면에서 제출해도 시트로 보내지 않아요.</div>':''}
     <div class="box"><div class="guide">점검자: <b>1검 ${esc(a.t[0])}</b>(담임) · <b>2검 ${esc(a.t[1])}</b>(인접 담임) · <b>3검 ${esc(a.t[2])}</b>(부담임)<br>
-      <b>학생부 항목별 출력물(현재학년)</b>을 보며 문항을 확인하고, 문제가 없으면 <b>○</b>를 눌러요. 고칠 곳이 있으면 담임에게 알려 수정한 뒤 ○를 눌러요.<br><span class="mini">💾 ○는 누를 때마다 이 기기에 저장돼요. 같은 기기·같은 브라우저라면 나갔다 들어와도 이어서 할 수 있어요. (서명은 제출 전에 다시)</span></div></div>
+      <b>학생부 항목별 출력물(현재학년)</b>을 보며 문항을 확인하고, 문제가 없으면 <b>○</b>를 눌러요. 고칠 곳이 있으면 담임에게 알려 수정한 뒤 ○를 눌러요.<br><span class="mini">☁️ ○는 누를 때마다 저장돼요. 다른 기기에서 같은 이름·같은 반·차수로 들어와도 이어져요. (서명은 제출 전에 다시) · <span id="syncst"></span></span></div></div>
     ${S.r>0?`<div class="box"><div class="guide">📎 <b>12/16(수) 집합점검</b> — ${S.r===1?'<b>6교시 📎A 과세특</b> → <b>7교시 📎B 과세특 외</b>':'<b>6교시 📎B 과세특 외</b> → <b>7교시 📎A 과세특</b>'} · 고칠 곳은 <b>형광펜</b>으로 표시하고 <b>포스트잇</b>에 적어 붙이거나 위치를 안내해요. 지급받은 필기구는 점검 후 반납해요.<br><span class="mini">출력물은 교시마다 <b>📎A·📎B 봉투째</b> 받아요 · 자격증은 📎B 봉투의 <b>자격증철</b>과 대조 · 봉사는 <b>교육과정 내 봉사</b>의 <b>시간·영역·봉사활동 내용</b>이 맞게(학년별 4시간) 입력되었는지 · 출결은 같은 사유 <b>연속 7일 이상</b> 결석의 특기사항 확인 · 7교시 후 출력물을 봉투에 넣어 <b>담임에게 전달</b>해요(담임이 12/18 자체 파쇄 (수정·완료 확인 후 파쇄)).</span></div></div>`:''}
     ${S.r===0?`<div class="box"><h3>표지 · 점검 항목 (학생부 항목별 출력 · 현재학년) <span class="mini">담임만</span></h3><div class="cov">${COVER.map((c,i)=>`<label><input type="checkbox" data-cv="${i}" ${D.cover[i]?'checked':''}> <span><span class="tag" style="margin:0 4px 0 0;${COVER_G[i]==='A'?'background:#fde8d8;color:#9a3412':'background:#e3f0e6;color:#166534'}">${COVER_G[i]}</span>${c}${COVER_TIP[i]?`<small class="mini" style="display:block">${COVER_TIP[i]}</small>`:''}</span></label>`).join('')}</div>
       <p class="mini" style="margin:8px 0 0">봉사활동 확인서철은 따로 만들지 않아요. 입력한 담임이 <b>봉사활동 확인서를 기준으로</b> 입력 내용을 확인하고, 특히 <b>교육과정 외 봉사</b>에 참여한 학생의 봉사시간이 입력됐는지 봐요.</p></div>`:''}
@@ -216,18 +218,79 @@ function openCheck(){
       <div id="conf"></div>
     </div>`;
   app.querySelectorAll('.item').forEach(el=>el.querySelector('.okb').onclick=()=>{
-    const id=el.dataset.id; D.items[id]=!D.items[id]; el.classList.toggle('on',!!D.items[id]); el.querySelector('.okb').textContent=D.items[id]?'○':''; save(); count();
+    const id=el.dataset.id; D.items[id]=!D.items[id]; (D.ict=D.ict||{})[id]=Date.now(); el.classList.toggle('on',!!D.items[id]); el.querySelector('.okb').textContent=D.items[id]?'○':''; save(); count();
   });
-  app.querySelectorAll('[data-cv]').forEach(cb=>cb.onchange=()=>{ D.cover[cb.dataset.cv]=cb.checked; save(); });
-  $('#memo').oninput = () => { D.memo=$('#memo').value; save(); };
+  app.querySelectorAll('[data-cv]').forEach(cb=>cb.onchange=()=>{ D.cover[cb.dataset.cv]=cb.checked; (D.cct=D.cct||{})[cb.dataset.cv]=Date.now(); save(); });
+  $('#memo').oninput = () => { D.memo=$('#memo').value; D.mt=Date.now(); save(); };
   pad('sigA'); pad('sigB');
   app.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>pads[b.dataset.clr].clear());
   $('#send').onclick = () => trySend(false);
-  const sent = store.get('jc:sent:'+keyOf().slice(3));
+  const sent = sentText();
   $('#st').innerHTML = sent ? `✅ 마지막 제출 <b>${sent}</b> · 다시 제출하면 덮어써요.` : '아직 제출하지 않았어요.';
   count(); window.scrollTo(0,0);
+  pullRemote();
 }
-const save = () => store.set(keyOf(), D);
+const save = () => { store.set(keyOf(), D); schedulePush(); };
+/* ===================== 다른 기기와 이어 가기 =====================
+   교내 체크리스트와 같은 구글 시트(Apps Script)에 반·차수·이름별로 1줄씩 저장해요.
+   항목마다 나중에 바꾼 쪽을 따르고, 시각이 같으면 ○ 한 쪽을 남겨요. (서명은 저장하지 않아요) */
+const SYNC_URL = 'https://script.google.com/macros/s/AKfycbwhArXb4Glc55rzbcNaxcvk23fuZg5WPc8Y1HKzc7B4hGLzFnFrrQbzzvRVFFR0ZPCGAg/exec';
+const sync = { timer:null, dirty:false, state:'' };
+const syncKey = () => { const a=ASSIGN.find(x=>x.g===S.g && x.c===S.c); return `j:${S.g}-${S.c}-${S.r+1}:${a?a.t[S.r]:S.name}`; };
+const canSync = () => SYNC_URL && S && S.g && !S.preview;
+const toCloud = d => ({ items:{ checks:d.items||{}, ct:d.ict||{}, memo:d.memo||'', mt:d.mt||0, sent:d.sentAt||'' }, cover:{ checks:d.cover||{}, ct:d.cct||{} } });
+function fromCloud(c){ const it=c.items||{}, cv=c.cover||{};
+  return { items:it.checks||{}, ict:it.ct||{}, memo:it.memo||'', mt:it.mt||0, sentAt:it.sent||'', cover:cv.checks||{}, cct:cv.ct||{}, cv:2 }; }
+function mergeCard(a, b){
+  if(!a) return b; if(!b) return a;
+  const o = { checks:{}, ct:{} }, ac=a.checks||{}, bc=b.checks||{}, at=a.ct||{}, bt=b.ct||{};
+  Object.keys(Object.assign({}, ac, bc)).forEach(k=>{ const ta=at[k]||0, tb=bt[k]||0;
+    if(!(k in bc)){ o.checks[k]=ac[k]; if(ta) o.ct[k]=ta; return; }
+    if(!(k in ac)){ o.checks[k]=bc[k]; if(tb) o.ct[k]=tb; return; }
+    o.checks[k] = ta>tb ? ac[k] : tb>ta ? bc[k] : !!(ac[k]||bc[k]); if(Math.max(ta,tb)) o.ct[k]=Math.max(ta,tb); });
+  const am=a.mt||0, bm=b.mt||0, memo = am>=bm ? (a.memo!=null?a.memo:b.memo) : (b.memo!=null?b.memo:a.memo);
+  if(memo) o.memo=memo; if(Math.max(am,bm)) o.mt=Math.max(am,bm);
+  const s=[a.sent,b.sent].filter(Boolean).sort().pop(); if(s) o.sent=s;
+  return o;
+}
+const mergeAll = (a,b) => { a=a||{}; b=b||{}; const o={}; Object.keys(Object.assign({},a,b)).forEach(k=>o[k]=mergeCard(a[k],b[k])); return o; };
+const same = (a,b) => JSON.stringify(a)===JSON.stringify(b);
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')), ms))]);
+function setSync(st){ sync.state=st; const el=$('#syncst'); if(el) el.textContent = ({load:'다른 기기 기록 불러오는 중…', ok:'✅ 다른 기기와 이어져 있어요', save:'저장 중…', fail:'⚠️ 연결이 불안정해 이 기기에만 저장했어요(연결되면 다시 보내요)'})[st]||''; }
+function sentText(){ if(D.sentAt){ const d=new Date(D.sentAt); if(!isNaN(d)) return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; } return store.get('jc:sent:'+keyOf().slice(3)); }
+/* 불러온 기록을 화면에 바로 반영해요 (다시 그리지 않아서 쓰던 서명은 지워지지 않아요) */
+function applyD(){
+  app.querySelectorAll('.item').forEach(el=>{ const on=!!D.items[el.dataset.id]; el.classList.toggle('on',on); el.querySelector('.okb').textContent=on?'○':''; });
+  app.querySelectorAll('[data-cv]').forEach(cb=>{ cb.checked=!!D.cover[cb.dataset.cv]; });
+  const m=$('#memo'); if(m && document.activeElement!==m) m.value=D.memo||'';
+  const sent=sentText(); if($('#st')) $('#st').innerHTML = sent ? `✅ 마지막 제출 <b>${sent}</b> · 다시 제출하면 덮어써요.` : '아직 제출하지 않았어요.';
+  count();
+}
+async function pullRemote(){
+  if(!canSync()) return; const key=syncKey(); setSync('load');
+  try{
+    const r = await withTimeout(fetch(`${SYNC_URL}?action=load&key=${encodeURIComponent(key)}&t=${Date.now()}`, {redirect:'follow'}), 12000);
+    const j = await r.json(); if(!j.ok) throw new Error(j.error||'load');
+    if(!S || key!==syncKey()) return;
+    const remote = j.data || {}, local = toCloud(D), merged = mergeAll(local, remote);
+    if(!same(merged, local)){ const keep=D; D = Object.assign({}, keep, fromCloud(merged)); store.set(keyOf(), D); applyD(); toast('다른 기기에서 한 점검을 불러왔어요.'); }
+    setSync('ok');
+    if(!same(merged, remote)) pushRemote();
+  }catch(e){ setSync('fail'); }
+}
+function schedulePush(){ if(!canSync()) return; clearTimeout(sync.timer); sync.dirty=true; sync.timer=setTimeout(pushRemote, 1500); }
+async function pushRemote(){
+  if(!canSync()) return; clearTimeout(sync.timer); sync.timer=null; sync.dirty=false;
+  const key=syncKey(), body=JSON.stringify({action:'save', key, data:toCloud(D)}); setSync('save');
+  try{
+    const r = await withTimeout(fetch(SYNC_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body}), 15000);
+    const j = await r.json(); if(!j.ok) throw new Error(j.error||'save'); setSync('ok');
+  }catch(e){ sync.dirty=true; setSync('fail'); clearTimeout(sync.timer); sync.timer=setTimeout(pushRemote, 20000); }
+}
+function flushPush(){ if(!canSync() || !sync.dirty) return; sync.dirty=false; clearTimeout(sync.timer);
+  try{ navigator.sendBeacon(SYNC_URL, new Blob([JSON.stringify({action:'save', key:syncKey(), data:toCloud(D)})], {type:'text/plain;charset=utf-8'})); }catch(e){} }
+addEventListener('pagehide', flushPush);
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) flushPush(); else if(canSync() && $('#items') && sync.state!=='load') pullRemote(); });
 function count(){ const n=ITEMS.filter(it=>D.items[it.id]).length, T=ITEMS.length; $('#cnt').textContent=n; $('#pbar').style.width=(n/T*100)+'%';
   const pc=$('#ppct'); if(pc) pc.textContent=Math.round(n/T*100)+'%'; const lf=$('#pleft'); if(lf) lf.textContent = n<T ? `· 남은 ${T-n}개` : '· 모두 확인 ✅'; const nx=$('#pnext'); if(nx) nx.hidden = n>=T; }
 /* ‘안 한 문항’ 단추: 아직 ○를 누르지 않은 다음 문항으로 이동해요 (지금 보이는 곳 아래부터 찾아요) */
@@ -280,7 +343,7 @@ function trySend(force){
   const f=document.createElement('form'); f.method='POST'; f.action=FORM.action; f.target='sinkFrame'; f.style.display='none';
   Object.entries(FORM.entries).forEach(([k,e])=>{ if(!e) return; const i=document.createElement('input'); i.type='hidden'; i.name=e; i.value=v[k]!=null?v[k]:''; f.appendChild(i); });
   document.body.appendChild(f); f.submit(); f.remove();
-  const t=nowStr(); store.set('jc:sent:'+keyOf().slice(3), t);
+  const t=nowStr(); store.set('jc:sent:'+keyOf().slice(3), t); D.sentAt=new Date().toISOString(); save();
   $('#st').innerHTML = `✅ 제출했어요 <b>${t}</b> · 다시 제출하면 덮어써요.`;
   toast(`${S.g}학년 ${S.c}반 ${ROLE[S.r].split(' · ')[0]} 점검을 제출했어요.`);
 }
