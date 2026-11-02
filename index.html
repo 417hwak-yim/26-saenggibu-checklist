@@ -200,6 +200,57 @@ body.qon .top{padding-right:110px}
 .qhit{animation:qflash 2.4s ease-out;border-radius:10px}
 @keyframes qflash{0%,40%{box-shadow:0 0 0 4px var(--hl);background:#fff7cf}100%{box-shadow:0 0 0 0 transparent}}
 @media (max-width:560px){body.qon .top{padding-right:0;padding-top:46px}.qbtn{height:38px;padding:0 12px}}
+/* 12월 일정 달력 */
+.mc{background:#fff;border:1px solid #d6deeb;border-radius:16px;margin:14px 0;overflow:hidden}
+.mc>summary{list-style:none;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;cursor:pointer;user-select:none}
+.mc>summary::-webkit-details-marker{display:none}
+.mc-t{font-weight:800;font-size:16px;color:#18202e}
+.mc-nx{font-size:13.5px;color:#56617a;background:#f1f4f9;border-radius:99px;padding:3px 10px}
+.mc-nx b{color:#c0392b;margin-right:4px}
+.mc-tg{margin-left:auto;font-size:13px;font-weight:800;color:#1f5fbf;white-space:nowrap}
+.mc-tg::after{content:"펼치기 ▾"}
+.mc[open] .mc-tg::after{content:"접기 ▴"}
+.mc[open]>summary{border-bottom:1px solid #e3e8f0}
+.mc-body{padding:12px 14px 14px}
+.mc-lg{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+.mc-lg .mc-e{margin:0}
+.mc-fz{font-size:12px;font-weight:700;color:#7a5a00;background:#fff4cc;border-radius:6px;padding:3px 8px}
+.mc-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid #d6deeb;border-left:1px solid #d6deeb}
+.mc-h{background:#eef2f6;text-align:center;font-size:12.5px;font-weight:800;color:#56617a;padding:5px 0;border-right:1px solid #d6deeb;border-bottom:1px solid #d6deeb}
+.mc-c{min-height:78px;padding:5px 5px 6px;border-right:1px solid #d6deeb;border-bottom:1px solid #d6deeb;display:flex;flex-direction:column;gap:3px;min-width:0}
+.mc-c.none{background:#fafbfc}
+.mc-c.focus{background:#fffbe8}
+.mc-c.off{background:#f6f7f9}
+.mc-c.past>*{opacity:.42}
+.mc-c.today{box-shadow:inset 0 0 0 3px #1f5fbf}
+.mc-n{font-size:13px;font-weight:800;color:#18202e;display:flex;align-items:center;gap:4px}
+.mc-n.hol{color:#c0392b}
+.mc-n i,.mc-rd i{font-style:normal;font-size:10.5px;font-weight:800;color:#fff;background:#1f5fbf;border-radius:5px;padding:0 5px}
+.mc-e{display:block;font-size:11.5px;line-height:1.35;font-weight:700;padding:2px 5px 2px 6px;border-left:3px solid;border-radius:4px;word-break:keep-all;overflow-wrap:anywhere}
+.mc-lg .mc-e{display:inline-block}
+.mc-e small{display:block;font-size:10.5px;font-weight:600;opacity:.75}
+.mc-e.d{background:#fdeeec;border-color:#c0392b;color:#8e2418}
+.mc-e.c{background:#e7effb;border-color:#1f5fbf;color:#174a96}
+.mc-e.s{background:#e2f4f1;border-color:#0f766e;color:#0b4f49}
+.mc-e.e{background:#eef0f4;border-color:#9aa3b2;color:#56617a}
+.mc-list{display:none}
+.mc-r{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #e3e8f0}
+.mc-r.focus{background:#fffbe8}
+.mc-r.past{opacity:.45}
+.mc-r.today{box-shadow:inset 3px 0 0 #1f5fbf}
+.mc-rd{font-weight:800;font-size:14px;padding-left:6px;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.mc-rd span{font-size:11.5px;color:#56617a;font-weight:700}
+.mc-rv{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mc-rv .mc-e{font-size:13px}
+.mc-ft{margin:10px 0 0;font-size:12.5px;color:#56617a;line-height:1.6}
+.mc-ft b{color:#18202e}
+@media (max-width:640px){.mc-grid{display:none}.mc-list{display:block}}
+/* 잠긴 교육지원청 체크리스트 */
+.big.lock{background:#f3f5f8!important;border-color:#c3cad6!important;color:#56617a!important;cursor:not-allowed}
+.big.lock:hover{transform:none}
+.big.lock .bn{background:#9aa3b2!important}
+.big.lock .go{color:#56617a}
+.big.lock .go b{display:block;font-size:13px;color:#c0392b;text-align:right}
 </style>
 </head>
 <body>
@@ -1547,25 +1598,92 @@ const save = () => { store.set(userKey(), data); if(typeof schedulePush==='funct
 const nowStr = () => { const d=new Date(); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
 
 /* ---------- 첫 화면 ---------- */
+/* ===== 12월 생기부 점검 일정 달력 (접었다 펴기) · 교육지원청 체크리스트 열림 시각 ===== */
+const JC_OPEN = Date.UTC(2026, 11, 13, 15, 0, 0);   // 2026-12-14(월) 0:00 한국 시각에 열림
+const jcOpen = () => Date.now() >= JC_OPEN;
+function jcDday(){ const k=new Date(Date.now()+9*3600e3); const t=Date.UTC(k.getUTCFullYear(),k.getUTCMonth(),k.getUTCDate()); return Math.round((Date.UTC(2026,11,14)-t)/864e5); }
+function kstMD(){ const k=new Date(Date.now()+9*3600e3); return { y:k.getUTCFullYear(), m:k.getUTCMonth()+1, d:k.getUTCDate() }; }
+/* 종류: d 마감·완료 / c 점검 / s 제출·전달 / e 행사 */
+const MC_EV = {
+  3:[['d','진로희망분야 입력 완료','담임'],['d','행발 누가기록 2회 완료','담임'],['c','교육과정 내 봉사 입력 확인(1·2학년)','담임']],
+  7:[['d','행발 특기사항 완료','담임'],['s','창체·진로 특기자료 전달','부서·진로'],['c','교육과정 내 봉사 입력 확인(3학년)','담임']],
+  9:[['d','과세특 마감 (전 학생)','교과']],
+  11:[['d','동아리 완료 (누가+이수시간)','동아리'],['e','마지막 동아리 · 발표회']],
+  14:[['d','자율자치·진로·동아리 특기 완료','담임·동아리'],['c','담임 1차 점검 · 📎A·📎B 대봉투 받기','담임'],['s','🔓 교육지원청 체크리스트 열림']],
+  15:[['c','담임 1차 점검 · 출력물 봉투에 넣기','담임']],
+  16:[['c','집합점검 6·7교시 (📎A·📎B 교대)','전 교사']],
+  17:[['e','마지막 자율자치 (7교시)'],['d','지적사항 수정 완료','전 교사']],
+  18:[['d','자율자치 완료 (누가+이수시간)','담임'],['c','출력물 파쇄 (수정·완료 확인 후)','담임'],['e','진급/졸업사정회']],
+  21:[['s','자격증철 제출','담임'],['c','최종 점검 · 오류 보완']],
+  22:[['c','최종 점검 · 오류 보완']],
+  23:[['s','교육지원청 체크리스트 제출 ~16:50','1·2·3검'],['c','최종 점검 · 오류 보완']],
+  24:[['d','생기부반영 최종 마무리','전 교사'],['d','진로 완료 (누가+이수시간)','진로·담임']],
+  25:[['e','성탄절 (공휴일)']],
+  28:[['e','방학식 · 졸업식'],['d','출결 마감 (일마감 · 월마감)','담임']],
+  29:[['e','겨울방학']],30:[['e','겨울방학']],31:[['e','겨울방학']]
+};
+const MC_WD = ['일','월','화','수','목','금','토'];
+const mcWd = d => MC_WD[new Date(2026,11,d).getDay()];
+const mcEsc = s => String(s).replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+function mcChip(e){ return `<span class="mc-e ${e[0]}">${mcEsc(e[1])}${e[2]?`<small>${mcEsc(e[2])}</small>`:''}</span>`; }
+/* now: {m,d} 오늘(기본: 한국 시각) */
+function calBox(now){
+  now = now || kstMD();
+  const td = (now.y===2026 || now.y==null) && now.m===12 ? now.d : (now.m===11 || (now.y||2026)<2026 ? 0 : 99);
+  let open = false; try{ open = localStorage.getItem('mc:open')==='1'; }catch(e){}
+  /* 다음 일정 */
+  const days = Object.keys(MC_EV).map(Number).sort((a,b)=>a-b);
+  const nx = days.find(d => d>=td && MC_EV[d].some(e=>e[0]!=='e'));
+  let nxt = '';
+  if(nx){ const main = MC_EV[nx].filter(e=>e[0]!=='e').map(e=>e[1]); const dd = Math.round((Date.UTC(2026,11,nx)-Date.UTC(now.y||2026,now.m-1,now.d))/864e5);
+    nxt = `<span class="mc-nx"><b>${dd===0?'오늘':`D-${dd}`}</b> 12/${nx}(${mcWd(nx)}) ${mcEsc(main[0])}${main.length>1?` 외 ${main.length-1}`:''}</span>`; }
+  const weeks = [[null,1,2,3,4],[7,8,9,10,11],[14,15,16,17,18],[21,22,23,24,25],[28,29,30,31,null]];
+  const cls = d => [d<td?'past':'', d===td?'today':'', d>=14&&d<=23?'focus':'', d===25||d>=29?'off':''].filter(Boolean).join(' ');
+  let grid = '<div class="mc-grid"><div class="mc-h">월</div><div class="mc-h">화</div><div class="mc-h">수</div><div class="mc-h">목</div><div class="mc-h">금</div>';
+  weeks.forEach(w=>w.forEach(d=>{
+    if(d==null){ grid += '<div class="mc-c none"></div>'; return; }
+    grid += `<div class="mc-c ${cls(d)}"><b class="mc-n${d===25?' hol':''}">${d}${d===td?'<i>오늘</i>':''}</b>${(MC_EV[d]||[]).map(mcChip).join('')}</div>`;
+  }));
+  grid += '</div>';
+  let list = '<div class="mc-list">';
+  days.filter(d=>d<29).forEach(d=>{ list += `<div class="mc-r ${cls(d)}"><div class="mc-rd">12/${d}<span>${mcWd(d)}</span>${d===td?'<i>오늘</i>':''}</div><div class="mc-rv">${MC_EV[d].map(mcChip).join('')}</div></div>`; });
+  list += '<div class="mc-r off"><div class="mc-rd">12/29~</div><div class="mc-rv"><span class="mc-e e">겨울방학</span></div></div></div>';
+  return `<details class="mc" id="mcal"${open?' open':''}>
+  <summary><span class="mc-t">📅 12월 생기부 점검 일정</span>${nxt}<span class="mc-tg"></span></summary>
+  <div class="mc-body">
+    <div class="mc-lg"><span class="mc-e d">마감·완료</span><span class="mc-e c">점검</span><span class="mc-e s">제출·전달</span><span class="mc-e e">행사</span><span class="mc-fz">집중 점검 기간 12/14~12/23</span></div>
+    ${grid}${list}
+    <p class="mc-ft">최종 마무리 <b>12/24(목)</b> · 출결 마감 <b>12/28(월)</b> 방학식 당일 · 교육지원청 체크리스트는 <b>12/14(월)</b>에 열리고 <b>12/23(수) 16:50</b>까지 제출해요.</p>
+  </div></details>`;
+}
+function calBind(){ const el=document.getElementById('mcal'); if(el) el.addEventListener('toggle', ()=>{ try{ localStorage.setItem('mc:open', el.open?'1':'0'); }catch(e){} }); }
+
 function home(){
+  const jo = jcOpen();
   if(typeof flushPush==='function') flushPush();
   if(typeof clearHere==='function') clearHere();
   state = { role:null }; ADMIN_DAY = null;
   app.innerHTML = `
   <div class="hero"><h2>2026학년도 2학기 생기부 체크리스트</h2><p>할 일에 맞는 체크리스트를 골라 주세요.</p></div>
   <div class="bigs">
-    <button class="big blue" id="goSchool"><span class="bn">1</span><span class="bt"><b>본교 마감 체크리스트</b>
-      <em>12/1 ~ 12/28 · 담임교사 / 교과교사</em>
-      <small>날짜별 입력·마감을 끝냈는지 체크해요. 체크하면 담당자에게 바로 전달돼요.</small></span><span class="go">들어가기 →</span></button>
-    <a class="big green" href="selfcheck.html"><span class="bn">2</span><span class="bt"><b>지원청 제출 체크리스트</b>
-      <em>12/14 ~ 12/23 · 1검 담임 · 2검 인접 담임 · 3검 부담임</em>
-      <small>작성된 생기부를 점검하며 문항별 ○ 표시와 손글씨 서명을 제출해요. 12/16 집합점검 때 사용해요.</small></span><span class="go">들어가기 →</span></a>
-  </div>`;
+    <button class="big blue" id="goSchool"><span class="bn">1</span><span class="bt"><b>교내 항목별 체크리스트</b>
+      <em>12/1 ~ 12/28 · 교과교사 / 담임교사 · 항목별 완료일 기준</em>
+      <small>항목마다 정해진 <span style="font-weight:800">완료일(기한)에 맞춰</span> 끝낸 일을 체크해요. 체크하면 담당자에게 바로 전달돼요.</small></span><span class="go">들어가기 →</span></button>
+    <${jo?'a href="selfcheck.html"':'div aria-disabled="true"'} class="big green${jo?'':' lock'}" id="goJc"><span class="bn">2</span><span class="bt"><b>교육지원청 제출용 체크리스트</b>
+      <em>12/14(월) 열림 · 12/16(수) 집합점검 ~ 12/23(수) 16:50 퇴청 전 · 1검 담임 · 2검 인접 담임 · 3검 부담임</em>
+      <small>${jo?'문항별 ○ 표시와 손글씨 서명을 제출해요. <span style="font-weight:800">집합점검일부터 12/23 퇴청 전까지 반드시 완료</span>해요.':'아직 열리지 않았어요. <span style="font-weight:800">12/14(월) 0시에 자동으로 열려요.</span> 문항별 ○ 표시와 손글씨 서명을 제출해요.'}</small></span><span class="go">${jo?'들어가기 →':`🔒 12/14(월) 열림<b>D-${jcDday()}</b>`}</span></${jo?'a':'div'}>
+  </div>
+  ${calBox((()=>{ const t=today(); return {y:t.getFullYear(), m:t.getMonth()+1, d:t.getDate()}; })())}`;
+  calBind();
+  if(!jo) $('#goJc').onclick = () => toast('교육지원청 제출용 체크리스트는 12/14(월)에 열려요.');
   $('#who').classList.remove('hidden');
   $('#who').innerHTML = `<button class="btn sm" id="adm" style="color:var(--sub)">🔧 관리자 미리보기</button>`;
   $('#goSchool').onclick = schoolHome;
   $('#adm').onclick = adminLogin;
 }
+
+setInterval(()=>{ if(jcOpen() && document.querySelector('.big.lock')) home(); }, 30000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && jcOpen() && document.querySelector('.big.lock')) home(); });
 
 function schoolHome(){
   if(typeof flushPush==='function') flushPush();
@@ -1574,7 +1692,7 @@ function schoolHome(){
   const last = store.get('sgb:last');
   app.innerHTML = `
   <div style="margin-top:6px"><button class="btn sm" id="toMain">← 처음으로</button></div>
-  <div class="hero" style="padding-top:2vh"><div class="kick blue">1 · 본교 마감 체크리스트</div><h2>누구로 들어갈까요?</h2><p>날짜별로 해야 할 일을 확인하고, 끝낸 일을 체크해요.<br><span class="sendinfo">✔ 체크박스에 체크하면 <b>담당자에게 바로 전달</b>돼요. 따로 제출할 필요가 없어요.</span><br>최종 마무리 <b>12/24(목)</b> · 출결 마감 <b>12/28(월)</b></p></div>
+  <div class="hero" style="padding-top:2vh"><div class="kick blue">1 · 교내 항목별 체크리스트</div><h2>누구로 들어갈까요?</h2><p>날짜별로 해야 할 일을 확인하고, 끝낸 일을 체크해요.<br><span class="sendinfo">✔ 체크박스에 체크하면 <b>담당자에게 바로 전달</b>돼요. 따로 제출할 필요가 없어요.</span><br>최종 마무리 <b>12/24(목)</b> · 출결 마감 <b>12/28(월)</b></p></div>
   <div class="roles" style="margin-top:0">
     <button class="role" data-r="homeroom"><div class="ic">🏫</div><h3>담임교사</h3><p>학년·반·이름을 입력해요.<br>행발, 창체(자율자치·진로), 1차 점검, 자격증, 출결 마감</p></button>
     <button class="role" data-r="subject"><div class="ic">📘</div><h3>교과교사</h3><p>이름을 입력해요.<br>과목별 세특, 맞춤법·기재 불가 확인, 맡은 동아리</p></button>
