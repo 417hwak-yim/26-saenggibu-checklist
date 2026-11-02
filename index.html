@@ -223,6 +223,11 @@ body.qon .top{padding-right:110px}
 .mc-c.off{background:#f6f7f9}
 .mc-c.past>*{opacity:.42}
 .mc-c.today{box-shadow:inset 0 0 0 3px #1f5fbf}
+.mc-c.key{background:#ffe3dc;box-shadow:inset 0 0 0 3px #c0392b}
+.mc-c.key.today{box-shadow:inset 0 0 0 3px #c0392b,inset 0 0 0 6px #1f5fbf}
+.mc-r.key{background:#ffe3dc;box-shadow:inset 4px 0 0 #c0392b}
+.mc-c.key .mc-n{color:#c0392b;flex-wrap:wrap}
+.mc-n u,.mc-rd u{text-decoration:none;font-size:10.5px;font-weight:800;color:#fff;background:#c0392b;border-radius:5px;padding:0 5px}
 .mc-n{font-size:13px;font-weight:800;color:#18202e;display:flex;align-items:center;gap:4px}
 .mc-n.hol{color:#c0392b}
 .mc-n i,.mc-rd i{font-style:normal;font-size:10.5px;font-weight:800;color:#fff;background:#1f5fbf;border-radius:5px;padding:0 5px}
@@ -1444,13 +1449,13 @@ const H_CARDS = [
          '<b>6교시</b>: 📎A 봉투 → 인접 담임 · 📎B 봉투 → 부담임 (교시마다 봉투째 전달)',
          '<b>7교시</b>: 봉투를 서로 바꿔요 — 📎B 봉투 → 인접 담임 · 📎A 봉투 → 부담임 → 반 전체를 2번씩 점검',
          '대조: <b>자격증 → 자격증철</b>(📎B 봉투에 들어 있어요) · <b>봉사</b> → 교육과정 내 봉사의 <b>시간·영역·봉사활동 내용</b>이 맞게 입력되었는지(1·2학년 5/19·5/22·10/13, 3학년 5/11·6/22·10/19·11/30 · 각 4시간) · <b>출결</b> → 같은 사유 연속 7일 이상 결석의 특기사항',
-         '고칠 곳은 <b>형광펜</b>으로 표시하고 <b>포스트잇</b>에 적어 붙이거나 위치를 안내해요. 교무에서 지급받은 필기구는 점검 후 반납해요. 7교시가 끝나면 출력물을 봉투에 다시 넣어 <b>담임에게 전달</b> → 담임 확인·수정(12/17) → <b>12/18 자체 파쇄</b>(수정·완료 확인 후 파쇄)',
+         '고칠 곳은 <b>형광펜</b>으로 표시하고 <b>포스트잇</b>에 적어 붙이거나 위치를 안내해요. 교무에서 지급받은 필기구는 점검 후 반납해요. 7교시가 끝나면 출력물을 봉투에 다시 넣어 <b>담임에게 전달</b> → 담임 확인·수정(~12/18) → <b>12/18 자체 파쇄</b>(수정·완료 확인 후 파쇄)',
          '집합점검 때 <b>자체점검표(온라인)</b>에 접속해 문항별 ○와 서명을 입력해요. 마감 <b>12/23(수) 16:50(퇴청 전)</b>'] },
 
- { id:'h1217', end:'12-17', label:'12/17', dow:'목', title:'지적사항 수정 완료',
+ { id:'h1217', end:'12-18', label:'12/18 수정', dow:'금', title:'지적사항 수정 완료',
    items:[
     {id:'b', t:'교차점검 <b>지적사항 수정</b> 완료', s:'지적받은 사항은 그 타당성을 확인한 뒤 수정 · 교과 지적사항은 교과교사가 고쳤는지도 확인'}],
-   note:['이날 7교시에 <b>마지막 자율자치활동</b>이 있어요. 끝나면 누가기록을 마무리해요(12/18까지 완료).'] },
+   note:['12/17(목) 7교시에 <b>마지막 자율자치활동</b>이 있어요. 끝나면 누가기록을 마무리해요(12/18까지 완료).'] },
 
  { id:'h1218', end:'12-18', label:'12/18', dow:'금', title:'자율자치 누가기록 · 이수시간 완료 · 출력물 파쇄',
    items:[
@@ -1505,9 +1510,9 @@ const H_CARDS = [
    recv: 12월 중순 담임이 입력할 위탁교 수신자료 */
 const WITAK = [
   {g:1,c:1,no:'16',nm:'이○수', org:'소년원',                w:true,  recv:'창체 등'},
-  {g:1,c:4,no:'11',nm:'이○림', org:'피노키오Wee센터', w:true,  recv:'창체'},
-  {g:1,c:4,no:'17',nm:'한○우', org:'효광원',          w:true,  recv:'창체'},
-  {g:1,c:5,no:'1', nm:'강○솜', org:'병원학교', w:true,  recv:'창체'},
+  {g:1,c:4,no:'11',nm:'이○림', org:'피노키오Wee센터', w:true,  recv:'창체 등'},
+  {g:1,c:4,no:'17',nm:'한○우', org:'효광원',          w:true,  recv:'창체 등'},
+  {g:1,c:5,no:'1', nm:'강○솜', org:'병원학교', w:true,  recv:'창체 등'},
   {g:2,c:8,no:'5', nm:'김○아', org:'꿈사랑학교(병원학교)', w:true, recv:''},
   {g:3,c:4,no:'5', nm:'박○영', org:'소년원',  w:false, recv:'교과세특·창체·행발 등 (입력 안내 예정)'}
 ];
@@ -1558,7 +1563,7 @@ function sCards(){
     items:[{id:'a', t:'6·7교시 <b>집합 교차점검</b>에 참여했어요', s:'자체점검표(온라인)에 ○·서명 · 12/23(수) 16:50까지'}]
       .concat(subOf.map(h=>({id:`b${h.g}${h.c}`, t:`부담임 학급 <b>${h.g}-${h.c}반</b> 3차 점검`, s:`담임 ${h.name} · 6교시 📎B 과세특 외 / 7교시 📎A 과세특`}))),
     note:['<b>준비물</b>: 휴대폰/태블릿(자체점검표 ○·서명) · 형광펜·포스트잇·볼펜은 당일 편지봉투에 담아 개별 지급해요(점검 후 반납)','점검 범위: <b>2026학년도(올해)에 기재한 내용</b> 중점 · 담임이 준비한 <b>학생부 항목별 출력물(현재학년)</b>','묶음: <b>📎A 과세특</b>(교과학습발달상황) / <b>📎B 과세특 외</b>(창체·행발·인적·출결·봉사·자격증 등)','6교시: 인접 담임 📎A 봉투 · 부담임 📎B 봉투 / 7교시: 봉투를 서로 바꿔요','대조: 자격증 → <b>자격증철</b> · 봉사 → 교육과정 내 봉사의 <b>시간·영역·봉사활동 내용</b>이 맞게 입력되었는지(학년별 4시간) · 출결 → 같은 사유 <b>연속 7일 이상</b> 결석의 특기사항','고칠 곳은 형광펜 표시 + 포스트잇에 적어 붙이거나 위치 안내 → 7교시 후 출력물을 봉투에 넣어 <b>담임에게 전달</b>(담임이 12/18 자체 파쇄 (수정·완료 확인 후 파쇄))',
-          '교차점검에서 <b>지적받은 사항</b>은 그 <b>타당성을 확인한 뒤 수정</b>해요. (12/17(목)까지)'] },
+          '교차점검에서 <b>지적받은 사항</b>은 그 <b>타당성을 확인한 뒤 수정</b>해요. (12/18(금)까지)'] },
   ...(subOf.length?[{ id:'s1223', end:'12-23', label:'12/23', dow:'수', title:'교육지원청 제출용 자체점검표 제출 (부담임 3검)', comb:'s1224',
     items:subOf.map(h=>({id:`p${h.g}${h.c}`, t:`<b>${h.g}-${h.c}반</b> 자체점검표(온라인) 3검 ○ 표시·서명 제출`, s:'12/23(수) 16:50(퇴청 전)까지'})) }]:[]),
   { id:'s1224', end:'12-24', label:'12/21~24', dow:'월~목', title:'최종 점검 · 오류 보완',
@@ -1609,11 +1614,11 @@ const MC_EV = {
   7:[['d','행발 특기사항 완료','담임'],['s','창체·진로 특기자료 전달','부서·진로'],['c','교육과정 내 봉사 입력 확인(3학년)','담임']],
   9:[['d','과세특 마감 (전 학생)','교과']],
   11:[['d','동아리 완료 (누가+이수시간)','동아리'],['e','마지막 동아리 · 발표회']],
-  14:[['d','자율자치·진로·동아리 특기 완료','담임·동아리'],['c','담임 1차 점검 · 📎A·📎B 대봉투 받기','담임'],['s','🔓 교육지원청 체크리스트 열림']],
-  15:[['c','담임 1차 점검 · 출력물 봉투에 넣기','담임']],
+  14:[['d','자율자치·진로·동아리 특기 완료','담임·동아리'],['c','담임 1차 점검','담임'],['s','🔓 교육지원청 체크리스트 열림']],
+  15:[['c','담임 1차 점검','담임']],
   16:[['c','집합점검 6·7교시 (📎A·📎B 교대)','전 교사']],
-  17:[['e','마지막 자율자치 (7교시)'],['d','지적사항 수정 완료','전 교사']],
-  18:[['d','자율자치 완료 (누가+이수시간)','담임'],['c','출력물 파쇄 (수정·완료 확인 후)','담임'],['e','진급/졸업사정회']],
+  17:[['e','마지막 자율자치 (7교시)']],
+  18:[['d','지적사항 수정 완료','전 교사'],['d','자율자치 완료 (누가+이수시간)','담임'],['e','진급/졸업사정회']],
   21:[['s','자격증철 제출','담임'],['c','최종 점검 · 오류 보완']],
   22:[['c','최종 점검 · 오류 보완']],
   23:[['s','교육지원청 체크리스트 제출 ~16:50','1·2·3검'],['c','최종 점검 · 오류 보완']],
@@ -1638,15 +1643,16 @@ function calBox(now){
   if(nx){ const main = MC_EV[nx].filter(e=>e[0]!=='e').map(e=>e[1]); const dd = Math.round((Date.UTC(2026,11,nx)-Date.UTC(now.y||2026,now.m-1,now.d))/864e5);
     nxt = `<span class="mc-nx"><b>${dd===0?'오늘':`D-${dd}`}</b> 12/${nx}(${mcWd(nx)}) ${mcEsc(main[0])}${main.length>1?` 외 ${main.length-1}`:''}</span>`; }
   const weeks = [[null,1,2,3,4],[7,8,9,10,11],[14,15,16,17,18],[21,22,23,24,25],[28,29,30,31,null]];
-  const cls = d => [d<td?'past':'', d===td?'today':'', d>=14&&d<=23?'focus':'', d===25||d>=29?'off':''].filter(Boolean).join(' ');
+  const MC_KEY = {16:'집합점검일', 24:'최종 마무리'};
+  const cls = d => [d<td?'past':'', d===td?'today':'', MC_KEY[d]?'key':(d>=14&&d<=23?'focus':''), d===25||d>=29?'off':''].filter(Boolean).join(' ');
   let grid = '<div class="mc-grid"><div class="mc-h">월</div><div class="mc-h">화</div><div class="mc-h">수</div><div class="mc-h">목</div><div class="mc-h">금</div>';
   weeks.forEach(w=>w.forEach(d=>{
     if(d==null){ grid += '<div class="mc-c none"></div>'; return; }
-    grid += `<div class="mc-c ${cls(d)}"><b class="mc-n${d===25?' hol':''}">${d}${d===td?'<i>오늘</i>':''}</b>${(MC_EV[d]||[]).map(mcChip).join('')}</div>`;
+    grid += `<div class="mc-c ${cls(d)}"><b class="mc-n${d===25?' hol':''}">${d}${MC_KEY[d]?`<u>${MC_KEY[d]}</u>`:''}${d===td?'<i>오늘</i>':''}</b>${(MC_EV[d]||[]).map(mcChip).join('')}</div>`;
   }));
   grid += '</div>';
   let list = '<div class="mc-list">';
-  days.filter(d=>d<29).forEach(d=>{ list += `<div class="mc-r ${cls(d)}"><div class="mc-rd">12/${d}<span>${mcWd(d)}</span>${d===td?'<i>오늘</i>':''}</div><div class="mc-rv">${MC_EV[d].map(mcChip).join('')}</div></div>`; });
+  days.filter(d=>d<29).forEach(d=>{ list += `<div class="mc-r ${cls(d)}"><div class="mc-rd">12/${d}<span>${mcWd(d)}</span>${MC_KEY[d]?`<u>${MC_KEY[d]}</u>`:''}${d===td?'<i>오늘</i>':''}</div><div class="mc-rv">${MC_EV[d].map(mcChip).join('')}</div></div>`; });
   list += '<div class="mc-r off"><div class="mc-rd">12/29~</div><div class="mc-rv"><span class="mc-e e">겨울방학</span></div></div></div>';
   return `<details class="mc" id="mcal"${open?' open':''}>
   <summary><span class="mc-t">📅 12월 생기부 점검 일정</span>${nxt}<span class="mc-tg"></span></summary>
