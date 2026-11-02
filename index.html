@@ -256,6 +256,65 @@ body.qon .top{padding-right:110px}
 .big.lock .bn{background:#9aa3b2!important}
 .big.lock .go{color:#56617a}
 .big.lock .go b{display:block;font-size:13px;color:#c0392b;text-align:right}
+/* 📋 담당자 현황표 */
+.wrap.wide{max-width:1500px}
+.dashband{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:16px;background:#fff7e6;border:2px solid #d97706;color:#7c3a03;text-decoration:none;cursor:pointer;width:100%;text-align:left;font:inherit;margin-bottom:18px}
+.dashband:hover{transform:translateY(-2px)}
+.dashband .ic{font-size:28px}.dashband .tx{flex:1}.dashband b{display:block;font-size:18px}.dashband small{color:#9a5b1a}.dashband .go{font-weight:800}
+.dash .dhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:6px 0 10px}
+.dash h2{margin:0 0 4px;font-size:22px}
+.dash .dact{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dtool{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.dtool select,.dtool input[type=search]{height:36px;border:1px solid var(--line);border-radius:10px;padding:0 10px;background:#fff;font-size:14px}
+.dtool input[type=search]{width:150px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:8px 14px;font-weight:700;cursor:pointer}
+.seg button.on{background:var(--acc);color:#fff}
+.qk{display:flex;gap:6px;align-items:center;font-size:14px;font-weight:700;margin-left:auto}
+.dlg{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px;font-size:12.5px}
+.dlg .c{padding:3px 8px;border-radius:6px;border:1px solid var(--line);background:#fff}
+.dlg .done{background:var(--okbg)}.dlg .part{background:#fff8dc}.dlg .na{color:var(--muted)}.dlg .need{background:var(--okbg);border:2px solid #f59e0b}.dlg .ver{background:#e7effb}
+.vb{display:inline-block;font-size:11.5px;font-weight:800;color:#fff;background:#1f5fbf;border-radius:5px;padding:1px 6px}
+.dsum{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;margin:0 0 8px;color:var(--sub)}
+.dsum b{color:var(--ink)}.dsum .need b{color:#b45309}.dsum .ver b{color:#1f5fbf}
+.dtab{overflow:auto;max-height:calc(100vh - 290px);border:1px solid var(--line);border-radius:12px;background:#fff}
+table.dt{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+table.dt th,table.dt td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 6px;text-align:center;vertical-align:middle}
+table.dt thead th{position:sticky;top:0;background:#eef2f6;z-index:2;min-width:84px;cursor:pointer;font-weight:700}
+table.dt thead th b{display:block;font-size:13px}
+table.dt thead th span{display:block;font-size:11px;color:var(--sub);font-weight:600;line-height:1.3;max-width:110px;margin:0 auto}
+table.dt thead th em{display:block;font-style:normal;font-size:10.5px;color:var(--muted);margin-top:2px}
+table.dt th.nm{position:sticky;left:0;background:#f7f9fc;z-index:1;text-align:left;white-space:nowrap;min-width:120px}
+table.dt thead th.nm{z-index:3;background:#eef2f6;cursor:default}
+table.dt th.nm small{display:block;font-size:10.5px;color:var(--muted);font-weight:500}
+table.dt th.nm small.no{color:var(--red)}
+table.dt td.c{cursor:pointer;min-width:84px;transition:background .15s}
+table.dt td.c:hover{filter:brightness(.96)}
+table.dt td.c .ct{font-weight:700;white-space:nowrap}
+table.dt td.part{background:#fff8dc}
+table.dt td.need{background:var(--okbg);box-shadow:inset 0 0 0 2px #f59e0b}
+table.dt td.ver{background:#e7effb}
+table.dt td.zero{background:#fff;color:var(--sub)}
+table.dt td.na{color:#c3cad6;background:#fafbfc}
+table.dt.one{min-width:0;width:auto}
+table.dt.one td.c{text-align:left;vertical-align:top;min-width:260px;max-width:520px}
+table.dt.one ul{list-style:none;margin:4px 0 0;padding:0;font-size:12px;line-height:1.45}
+table.dt.one li{color:var(--muted)}table.dt.one li.y{color:var(--ok);font-weight:700}
+table.dt .mm{font-size:11.5px;color:#7a5a00;margin-top:3px}
+.dmodal{position:fixed;inset:0;background:rgba(15,20,30,.45);z-index:60;display:flex;align-items:center;justify-content:center;padding:16px}
+.dmodal.hidden{display:none}
+.dbox{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:18px 20px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.dmh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.dmh h3{margin:2px 0 10px;font-size:18px}
+.dlist{list-style:none;margin:0;padding:0}
+.dlist li{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.dlist .bx{flex:0 0 22px;height:22px;border:2px solid var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+.dlist li.y .bx{background:var(--ok);border-color:var(--ok)}
+.dlist .dlb{flex:1}.dlist .tm{font-size:12px;color:var(--muted)}
+.dmemo{margin-top:10px;background:var(--warnbg);border-radius:8px;padding:8px 10px;font-size:13.5px}
+.dguide{margin-top:10px;font-size:12.5px;color:var(--sub);background:#f5f7fb;border-radius:8px;padding:8px 10px;line-height:1.6}
+.dfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+@media (max-width:700px){.qk{margin-left:0}.dtab{max-height:none}}
 </style>
 </head>
 <body>
@@ -1723,12 +1782,193 @@ function adminLogin(){
     let ok = false;
     try { ok = (await sha256($('#pw').value.trim())) === ADMIN_HASH; } catch(e) { ok = false; }
     if(!ok){ $('#err').textContent = '비밀번호가 맞지 않아요.'; $('#pw').select(); return; }
-    try{ sessionStorage.setItem('sgb:adminok','1'); }catch(e){}
+    try{ sessionStorage.setItem('sgb:adminok','1'); sessionStorage.setItem('sgb:adminpw', $('#pw').value.trim()); }catch(e){}
     adminHub();
   };
   $('#go').onclick = go;
   $('#pw').onkeydown = e => { if(e.key==='Enter') go(); };
   $('#pw').focus();
+}
+
+
+/* =====================================================================
+   📋 담당자 현황표 — 선생님별·날짜(항목)별 체크를 한눈에 보고,
+   담당자가 나이스에서 확인한 칸에 '확인' 표시를 남겨요(시트 '담당확인' 탭에 저장 → 다른 기기에서도 보여요)
+   ===================================================================== */
+const DASH = { rows:null, marks:{}, at:'', tab:'h', card:'all', q:'', quick:false, only:'', pend:{}, busy:false };
+const dashPw = () => { try{ return sessionStorage.getItem('sgb:adminpw')||''; }catch(e){ return ''; } };
+const dashShort = t => strip(t).replace(/\s*\(.*?\)\s*/g,' ').replace(/교육지원청 제출용 /,'').trim();
+function dashTeachers(tab){
+  if(tab==='h') return HOMEROOMS.map(h=>({ key:`h:${h.g}-${h.c}:${h.name}`, name:h.name, sub:`${h.g}-${h.c}`, st:{role:'homeroom',g:h.g,c:h.c,name:h.name,sub:h.sub} }));
+  return ALLT().sort((a,b)=>a.localeCompare(b,'ko')).map(t=>({ key:`s:${t}`, name:t, sub:'', st:{role:'subject',teacher:t,name:t} }));
+}
+function dashLabel(card, k){
+  const it = (card.items||[]).find(i=>i.id===k);
+  if(card.kind==='seteuk'){ const p=S_PRE.find(x=>x.id===k); if(p) return '작성 안내·맞춤법 확인'; const m=k.match(/^c:(.+):(\d)-(.+)$/); if(m) return `${m[1]} ${m[2]}-${m[3]}반`; }
+  if(card.kind==='career'){ const m=k.match(/^[a-z](\d)-(.+)$/); if(m) return `${m[1]}-${m[2]}반`; }
+  if(card.kind==='club'){ const i=k.indexOf(':'); if(i>0) return k.slice(i+1); }
+  return it ? strip(it.sh||it.t) : k;
+}
+/* 선생님 한 분의 기록을 날짜 카드별로 계산해요 (화면용 state·data를 잠깐 바꿨다가 되돌려요) */
+function dashEval(T, rec){
+  const S0=state, D0=data, N0=NEWK, out={};
+  try{
+    state = Object.assign({}, T.st); data = rec||{}; NEWK = new Set();
+    cardsNow().forEach(c=>{ const ks=keysOf(c); if(!ks.length) return;
+      const cd=data[c.id]||{}, items=ks.map(k=>({ k, label:dashLabel(c,k), on:isOn(c.id,k), t:(cd.ct||{})[k]||0 }));
+      out[c.id] = { card:c, items, n:items.filter(i=>i.on).length, m:items.length, memo:cd.memo||'' }; });
+  }catch(e){ console.warn(e); }
+  state=S0; data=D0; NEWK=N0;
+  return out;
+}
+function dashCols(tab){
+  if(tab==='h') return H_CARDS.slice().sort((a,b)=>a.end.localeCompare(b.end));
+  const seen=new Map();
+  dashTeachers('s').forEach(T=>{ const S0=state; state=T.st; try{ sCards().forEach(c=>{ if(!seen.has(c.id)) seen.set(c.id,c); }); }catch(e){} state=S0; });
+  return [...seen.values()].sort((a,b)=>a.end.localeCompare(b.end));
+}
+function dashWhen(v){ v=String(v||''); const m=v.match(/(\d{4})[.\-\/]\s*(\d{1,2})[.\-\/]\s*(\d{1,2})\.?\s*(오전|오후)?\s*(\d{1,2}):(\d{2})/); if(m){ let h=+m[5]; if(m[4]==='오후'&&h<12) h+=12; if(m[4]==='오전'&&h===12) h=0; return `${+m[2]}/${+m[3]} ${String(h).padStart(2,'0')}:${m[6]}`; } const d=new Date(v); return isNaN(d)?v.slice(0,16):`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+const vKey = (tk, cid) => `${tk}|${cid}`;
+const vOn = (tk, cid) => !!(DASH.marks[vKey(tk,cid)] && DASH.marks[vKey(tk,cid)].on);
+async function dashCall(body){
+  const r = await withTimeout(fetch(SYNC_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(Object.assign({pw:dashPw()}, body))}), 20000);
+  const j = await r.json(); if(!j.ok) throw new Error(j.error||'error'); return j;
+}
+function dashOpen(){
+  if(typeof flushPush==='function') flushPush();
+  if(typeof clearHere==='function') clearHere();
+  state = { role:null }; document.querySelector('.wrap').classList.add('wide');
+  $('#who').classList.remove('hidden');
+  $('#who').innerHTML = `📋 <b>담당자 현황표</b> <button class="btn sm" id="out">← 관리자 메뉴</button>`;
+  $('#out').onclick = () => { document.querySelector('.wrap').classList.remove('wide'); adminHub(); };
+  if(!dashPw()){
+    app.innerHTML = `<div class="login"><h3>📋 담당자 현황표</h3><p class="mini" style="margin:0 0 6px">선생님들의 체크 기록을 불러오려면 관리자 비밀번호를 한 번 더 넣어 주세요.</p>
+      <label>비밀번호</label><input id="pw" type="password" inputmode="numeric" autocomplete="off"><div class="err" id="err"></div>
+      <div class="acts"><button class="btn pri" id="go">불러오기</button></div></div>`;
+    const go = async () => { const v=$('#pw').value.trim(); let ok=false; try{ ok=(await sha256(v))===ADMIN_HASH; }catch(e){}
+      if(!ok){ $('#err').textContent='비밀번호가 맞지 않아요.'; return; } try{ sessionStorage.setItem('sgb:adminpw', v); sessionStorage.setItem('sgb:adminok','1'); }catch(e){} dashOpen(); };
+    $('#go').onclick = go; $('#pw').onkeydown = e => { if(e.key==='Enter') go(); }; $('#pw').focus(); return;
+  }
+  app.innerHTML = `<div class="dash">
+    <div class="dhead"><div><h2>📋 담당자 현황표</h2><p class="mini">선생님이 체크한 항목을 날짜별로 보고, <b>나이스에서 확인한 칸</b>에 <b class="vb">✔ 확인</b> 표시를 남겨요. 확인 표시는 시트에 저장돼 다른 기기에서도 보여요.</p></div>
+      <div class="dact"><span id="dst" class="mini"></span><button class="btn sm" id="dre">🔄 다시 불러오기</button><button class="btn sm" id="dcsv">⬇ 표 내려받기(CSV)</button></div></div>
+    <div class="dtool">
+      <div class="seg"><button data-tab="h">🏫 담임교사</button><button data-tab="s">📘 교과교사</button></div>
+      <select id="dcard"></select>
+      <select id="donly"><option value="">모든 칸</option><option value="need">확인 필요 (완료 · 미확인)</option><option value="part">진행 중</option><option value="zero">아직 체크 없음</option><option value="ver">확인 완료</option></select>
+      <input id="dq" type="search" placeholder="이름·반 찾기">
+      <label class="qk"><input type="checkbox" id="dquick"> 빠른 확인 <span class="mini">(칸을 누르면 바로 확인 표시)</span></label>
+    </div>
+    <div class="dlg"><span class="c done">✅ 완료</span><span class="c part">🟡 진행 중</span><span class="c zero">⬜ 체크 없음</span><span class="c na">· 해당 없음</span><span class="c need">완료 · 확인 필요</span><span class="c ver"><b class="vb">✔ 확인</b> 담당자 확인</span></div>
+    <div id="dsum" class="dsum"></div>
+    <div class="dtab" id="dtab"><div class="mini" style="padding:20px">불러오는 중…</div></div>
+  </div>
+  <div class="dmodal hidden" id="dmodal"><div class="dbox" role="dialog" aria-modal="true"></div></div>`;
+  app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ DASH.tab=b.dataset.tab; DASH.card='all'; dashRender(); });
+  $('#dcard').onchange = e => { DASH.card=e.target.value; dashRender(); };
+  $('#donly').onchange = e => { DASH.only=e.target.value; dashRender(); };
+  $('#dq').oninput = e => { DASH.q=e.target.value.trim(); dashRender(); };
+  $('#dquick').onchange = e => { DASH.quick=e.target.checked; };
+  $('#dre').onclick = dashLoad; $('#dcsv').onclick = dashCsv;
+  $('#dmodal').onclick = e => { if(e.target.id==='dmodal') dashClose(); };
+  dashLoad();
+}
+async function dashLoad(){
+  if(!SYNC_URL){ $('#dtab').innerHTML='<div class="mini" style="padding:20px">SYNC_URL이 비어 있어요.</div>'; return; }
+  $('#dst').textContent='☁️ 불러오는 중…';
+  try{
+    const j = await dashCall({action:'all'});
+    DASH.rows = {}; (j.rows||[]).forEach(r=>{ DASH.rows[r.key]={ data:r.data||{}, saved:r.saved }; });
+    DASH.marks = Object.assign({}, j.marks||{}, ...Object.entries(DASH.pend).map(([k,v])=>({[k]:v})));
+    DASH.at = nowStr(); $('#dst').textContent=`☁️ ${DASH.at} 불러옴`;
+    dashRender();
+  }catch(e){
+    if(String(e.message)==='auth'){ try{ sessionStorage.removeItem('sgb:adminpw'); }catch(x){} toast('비밀번호를 다시 넣어 주세요.'); dashOpen(); return; }
+    $('#dst').textContent='⚠️ 불러오지 못했어요'; if(!DASH.rows) $('#dtab').innerHTML=`<div class="mini" style="padding:20px">⚠️ 기록을 불러오지 못했어요. Apps Script를 새 버전으로 배포했는지 확인해 주세요. (${esc(e.message)})</div>`;
+  }
+}
+function dashState(r, tk, cid){
+  if(!r) return 'na';
+  const v=vOn(tk,cid);
+  if(v) return 'ver';
+  if(r.m && r.n===r.m) return 'need';
+  return r.n ? 'part' : 'zero';
+}
+function dashRender(){
+  if(!DASH.rows) return;
+  app.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on', b.dataset.tab===DASH.tab));
+  const cols = dashCols(DASH.tab), sel = $('#dcard');
+  sel.innerHTML = `<option value="all">모든 날짜 한눈에</option>` + cols.map(c=>`<option value="${c.id}" ${DASH.card===c.id?'selected':''}>${esc(c.label)} · ${esc(dashShort(c.title))}</option>`).join('');
+  const show = DASH.card==='all' ? cols : cols.filter(c=>c.id===DASH.card);
+  const q = DASH.q.replace(/\s+/g,'');
+  const list = dashTeachers(DASH.tab).map(T=>({ T, rec:DASH.rows[T.key], ev:dashEval(T, (DASH.rows[T.key]||{}).data) }))
+    .filter(x=> DASH.tab==='h' || Object.keys(x.ev).length)                       // 교과: 맡은 항목이 있는 선생님만
+    .filter(x=> !q || (x.T.name+x.T.sub).replace(/\s+/g,'').includes(q) || (x.T.sub && ('담임'+x.T.sub+'반').includes(q)));
+  const rowsF = DASH.only ? list.filter(x=>show.some(c=>dashState(x.ev[c.id], x.T.key, c.id)===DASH.only)) : list;
+  // 위쪽 요약
+  let tot=0, done=0, ver=0, need=0;
+  list.forEach(x=>show.forEach(c=>{ const r=x.ev[c.id]; if(!r) return; tot++; const st=dashState(r,x.T.key,c.id); if(st==='ver') ver++; if(st==='need') need++; if(r.n===r.m) done++; }));
+  const notIn = list.filter(x=>!x.rec).length;
+  $('#dsum').innerHTML = `<span><b>${list.length}</b>명</span><span>체크 완료 칸 <b>${done}</b> / ${tot}</span><span class="need">확인 필요 <b>${need}</b></span><span class="ver">담당자 확인 <b>${ver}</b></span>${notIn?`<span class="mini">아직 한 번도 들어오지 않은 선생님 ${notIn}명</span>`:''}`;
+  const one = DASH.card!=='all';
+  let h = `<table class="dt${one?' one':''}"><thead><tr><th class="nm">${DASH.tab==='h'?'반 · 담임':'교과교사'}</th>` +
+    show.map(c=>{ let cd=0, cv=0, ct=0; list.forEach(x=>{ const r=x.ev[c.id]; if(!r) return; ct++; if(r.n===r.m) cd++; if(vOn(x.T.key,c.id)) cv++; });
+      return `<th data-col="${c.id}" title="${esc(strip(c.title))}"><b>${esc(c.label)}</b><span>${esc(dashShort(c.title))}</span><em>완료 ${cd}/${ct} · 확인 ${cv}</em></th>`; }).join('') + `</tr></thead><tbody>`;
+  rowsF.forEach(x=>{
+    h += `<tr><th class="nm">${x.T.sub?`<b>${x.T.sub}</b> `:''}${esc(x.T.name)}${x.rec?`<small>${esc(dashWhen(x.rec.saved))} 저장</small>`:'<small class="no">미접속</small>'}</th>`;
+    show.forEach(c=>{
+      const r=x.ev[c.id], st=dashState(r, x.T.key, c.id);
+      if(!r){ h+=`<td class="na">·</td>`; return; }
+      const icon = r.n===r.m ? '✅' : r.n ? '🟡' : '⬜';
+      const inner = one ? `<ul>${r.items.map(i=>`<li class="${i.on?'y':''}">${i.on?'✓':'·'} ${esc(i.label)}</li>`).join('')}</ul>${r.memo?`<div class="mm">📝 ${esc(r.memo)}</div>`:''}` : '';
+      h += `<td class="c ${st}" data-tk="${esc(x.T.key)}" data-cid="${c.id}"><div class="ct">${icon} ${r.n}/${r.m}${r.memo&&!one?' 📝':''}</div>${vOn(x.T.key,c.id)?'<b class="vb">✔ 확인</b>':''}${inner}</td>`;
+    });
+    h += `</tr>`;
+  });
+  h += `</tbody></table>`;
+  if(!rowsF.length) h = `<div class="mini" style="padding:20px">조건에 맞는 칸이 없어요.</div>`;
+  $('#dtab').innerHTML = h;
+  $('#dtab').querySelectorAll('td.c').forEach(td=>td.onclick=()=>{ const tk=td.dataset.tk, cid=td.dataset.cid; if(DASH.quick) dashToggle(tk,cid); else dashDetail(tk,cid); });
+  $('#dtab').querySelectorAll('th[data-col]').forEach(th=>th.onclick=()=>{ DASH.card = DASH.card===th.dataset.col?'all':th.dataset.col; dashRender(); });
+}
+function dashDetail(tk, cid){
+  const T = dashTeachers(DASH.tab).find(t=>t.key===tk), r = dashEval(T, (DASH.rows[tk]||{}).data)[cid]; if(!r) return;
+  const m = DASH.marks[vKey(tk,cid)], fmt = t => { if(!t) return ''; const d=new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+  const box = $('#dmodal .dbox');
+  box.innerHTML = `<div class="dmh"><div><span class="mini">${esc(r.card.label)} · ${T.sub?T.sub+'반 담임 ':''}${esc(T.name)}</span><h3>${esc(strip(r.card.title))}</h3></div><button class="btn sm" id="dx">닫기</button></div>
+    <ul class="dlist">${r.items.map(i=>`<li class="${i.on?'y':''}"><span class="bx">${i.on?'✓':''}</span><span class="dlb">${esc(i.label)}</span><span class="tm">${i.on?fmt(i.t):''}</span></li>`).join('')}</ul>
+    ${r.memo?`<div class="dmemo">📝 선생님 메모: ${esc(r.memo)}</div>`:''}
+    ${r.card.guide?`<div class="dguide"><b>나이스에서 확인</b> · ${r.card.guide}</div>`:''}
+    <div class="dfoot"><span class="mini">${m&&m.on?`✔ 담당자 확인 ${fmt(m.t)}`:r.n===r.m?'선생님이 모두 체크했어요. 나이스에서 확인한 뒤 눌러 주세요.':`아직 ${r.m-r.n}개 남았어요.`}</span>
+      <button class="btn ${m&&m.on?'':'pri'}" id="dv">${m&&m.on?'확인 표시 지우기':'✔ 나이스 확인 완료'}</button></div>`;
+  $('#dmodal').classList.remove('hidden');
+  $('#dx').onclick = dashClose;
+  $('#dv').onclick = () => { dashToggle(tk, cid); dashDetail(tk, cid); };
+}
+function dashClose(){ $('#dmodal').classList.add('hidden'); }
+function dashToggle(tk, cid){
+  const k = vKey(tk,cid), on = !vOn(tk,cid);
+  DASH.marks[k] = { on, t:Date.now(), by:'담당자' }; DASH.pend[k] = DASH.marks[k];
+  dashRender(); dashFlush();
+}
+async function dashFlush(){
+  if(DASH.busy || !Object.keys(DASH.pend).length) return;
+  DASH.busy = true; const send = Object.assign({}, DASH.pend);
+  $('#dst').textContent='☁️ 확인 표시 저장 중…';
+  try{
+    const j = await dashCall({action:'verify', marks:send});
+    Object.keys(send).forEach(k=>{ if(DASH.pend[k]===send[k]) delete DASH.pend[k]; });
+    DASH.marks = Object.assign({}, j.marks||{}, DASH.pend);
+    $('#dst').textContent=`☁️ 확인 표시 저장됨 ${nowStr()}`; dashRender();
+  }catch(e){ $('#dst').textContent='⚠️ 확인 표시를 저장하지 못했어요. 잠시 뒤 다시 저장해요.'; setTimeout(dashFlush, 15000); }
+  DASH.busy = false; if(Object.keys(DASH.pend).length) setTimeout(dashFlush, 300);
+}
+function dashCsv(){
+  const cols = dashCols(DASH.tab), rows = [[DASH.tab==='h'?'반':'', '이름', ...cols.map(c=>`${c.label} ${dashShort(c.title)}`)]];
+  dashTeachers(DASH.tab).forEach(T=>{ const ev=dashEval(T,(DASH.rows[T.key]||{}).data); if(DASH.tab==='s' && !Object.keys(ev).length) return;
+    rows.push([T.sub, T.name, ...cols.map(c=>{ const r=ev[c.id]; if(!r) return ''; return `${r.n}/${r.m}${vOn(T.key,c.id)?' 확인':''}`; })]); });
+  const csv = '﻿' + rows.map(r=>r.map(v=>{ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(',')).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`체크리스트_현황_${DASH.tab==='h'?'담임':'교과'}_${nowStr().replace(/[\/: ]/g,'')}.csv`; document.body.appendChild(a); a.click(); a.remove();
 }
 
 function adminHub(){
@@ -1739,6 +1979,7 @@ function adminHub(){
   $('#who').innerHTML = `🔧 <b>관리자 미리보기</b> <button class="btn sm" id="out">나가기</button>`; $('#out').onclick = home;
   const names = ALLT().sort((a,b)=>a.localeCompare(b,'ko'));
   app.innerHTML = `
+  <button class="dashband" id="aDash"><span class="ic">📋</span><span class="tx"><b>담당자 현황표</b><small>선생님별·날짜별 체크를 한눈에 보고, 나이스에서 확인한 칸에 '확인' 표시를 남겨요</small></span><span class="go">열기 →</span></button>
   <div class="hero" style="padding-bottom:10px"><h2>관리자 미리보기</h2><p>선생님들이 보는 화면을 그대로 열어 봐요. 여기서 체크·제출한 것은 <b>시트로 보내지 않아요.</b></p></div>
   <div class="roles">
     <button class="role" id="aHr"><div class="ic">🏫</div><h3>담임교사 화면</h3><p>모든 학년 항목을 한 번에 보여 줘요.<br>날짜를 바꿔 '지금 할 일'을 확인할 수 있어요.</p></button>
@@ -1749,6 +1990,7 @@ function adminHub(){
   <div class="sepline"><span>지원청 제출 서류</span></div>
   <a class="jcband" href="selfcheck.html?preview=1"><span class="ic">📝</span><span class="tx"><b>자체점검표 미리보기</b><small>학년·반과 1·2·3검을 골라 점검 화면을 봐요 · 제출되지 않아요</small></span><span class="go">열기 →</span></a>
   <a class="jcband" href="selfcheck.html?admin=1" style="margin-top:10px;background:#fff"><span class="ic">📊</span><span class="tx"><b>자체점검표 수합 · PDF 만들기</b><small>제출 현황을 보고 지원청 제출용 PDF를 만들어요</small></span><span class="go">열기 →</span></a>`;
+  $('#aDash').onclick = dashOpen;
   $('#aHr').onclick = () => { state = { role:'homeroom', admin:true, g:1, c:1, name:'관리자', sub:'' }; data = loadData(); board(); };
   $('#aSub').onclick = () => { const t=$('#aT').value; state = { role:'subject', admin:true, teacher:t, name:t }; data = loadData(); board(); };
 }
