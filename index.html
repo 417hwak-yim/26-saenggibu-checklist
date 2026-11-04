@@ -279,6 +279,26 @@ body.qon .top{padding-right:110px}
 .dlg .c{padding:3px 8px;border-radius:6px;border:1px solid var(--line);background:#fff}
 .dlg .done{background:var(--okbg)}.dlg .part{background:#fff8dc}.dlg .na{color:var(--muted)}.dlg .need{background:var(--okbg);border:2px solid #f59e0b}.dlg .ver{background:#e7effb}
 .vb{display:inline-block;font-size:11.5px;font-weight:800;color:#fff;background:#1f5fbf;border-radius:5px;padding:1px 6px}
+.todo .tg{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 0 12px;overflow:hidden}
+.todo .tgh{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;background:#eef2f6;border-bottom:1px solid var(--line)}
+.todo .tgh b{font-size:15px}.todo .tgh .dd{color:var(--acc);font-weight:800;margin-right:6px}
+.todo .tgh .cnt{font-size:12.5px;color:var(--sub)}.todo .tgh .cnt b{font-size:13px;color:#b45309}
+.todo .tw{border-top:1px solid var(--line)}.todo .tw:first-of-type{border-top:0}
+.todo .twh{display:flex;align-items:center;gap:8px;padding:8px 14px 4px;font-size:14px}
+.todo .twh .who{font-weight:800}.todo .twh .rl{font-size:11px;font-weight:700;border-radius:5px;padding:1px 6px;background:#e8eefc;color:#1f5fbf}.todo .twh .rl.h{background:#e9f7ef;color:#137a3c}
+.todo .twh .all{margin-left:auto}
+.dtab.tl{max-height:none;overflow:visible;border:0;background:transparent}
+.todo .tr{display:grid;grid-template-columns:132px 1fr auto;gap:10px;align-items:center;padding:6px 14px 6px 30px;font-size:14px}
+.todo .tr:hover{background:#f7f9fc}
+.todo .tr .tm{font-variant-numeric:tabular-nums;color:var(--sub);font-size:12.5px}.todo .tr .tm .nw{display:inline-block;font-size:10.5px;font-weight:800;color:#fff;background:#e5484d;border-radius:4px;padding:0 4px;margin-left:4px}
+.todo .tr .wh b{font-weight:800}.todo .tr .wh small{display:block;color:var(--muted);font-size:11.5px}
+.todo .tr.done .wh{color:var(--muted)}.todo .tr.done .wh b{color:var(--sub)}
+.vbtn{height:32px;border-radius:9px;border:1.5px solid #1f5fbf;background:#fff;color:#1f5fbf;font-weight:800;font-size:13px;padding:0 12px;cursor:pointer;white-space:nowrap}
+.vbtn.on{background:#1f5fbf;color:#fff}
+.vbtn.on small{font-weight:600;opacity:.85;margin-left:4px}
+.todo .tgn{padding:10px 14px;font-size:13px;color:var(--muted)}
+.dsum .new b{color:#e5484d}
+@media(max-width:640px){.todo .tr{grid-template-columns:1fr auto;padding-left:14px}.todo .tr .tm{grid-column:1/-1}}
 .dsum{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;margin:0 0 8px;color:var(--sub)}
 .dsum b{color:var(--ink)}.dsum .need b{color:#b45309}.dsum .ver b{color:#1f5fbf}
 .dtab{overflow:auto;max-height:calc(100vh - 290px);border:1px solid var(--line);border-radius:12px;background:#fff}
@@ -1276,6 +1296,9 @@ const JINRO_CLS = {"최석원": ["2-5", "2-6"], "송혜진": ["1-1", "1-2"], "�
 
 /* 동아리 지도교사 (학생 주도 정규동아리) */
 
+/* 3학년 학생이 있는 동아리 (동아리 명단 11/4 기준) */
+const CLUB3 = new Set(["경제금융반","경제탐구3반","댄스2반","도서2반","도서관탐방2반","드로잉아트2반","드림케어2반(또래상담반)","디자인매니아2반","디지털 전략가반","디지털크래프트2반","만화창작2반","방송영상미디어2반","보건의료탐구반","보드마카2반","생활체육탐방반","어쿠스틱앙상블2반","업사이클링 공예2반","진로포트폴리오반","카페창업준비2반","폴라리스3반","프랩2반","피티마스터2반"]);
+const clubs3 = t => (CLUBS[t]||[]).filter(c=>CLUB3.has(c));
 const CLUBS = {
  "안은아": [
   "경제금융반"
@@ -1670,20 +1693,25 @@ function sCards(){
       base.note=['<b>3학년 반</b>은 이 카드에 없어요. <b>11/20 3학년</b> 카드에서 먼저 끝내요(11/30 대입전형 자료 기준).'].concat(base.note); }
     else cards.splice(cards.indexOf(base),1);
   }
-  if(hasClub){
-    cards.push({ id:'s1120c', end:'11-20', label:'11/20 동아리', dow:'금', g3:true, title:'동아리 3학년 학생 특기사항 완료', kind:'club', sub:'g3',
-      items:[{id:'g3', t:'<b>3학년 학생</b> 동아리 특기사항 작성 완료', s:'3학년 학생이 없는 동아리는 확인 후 체크만 해요'}],
+  const cl3 = clubs3(t);
+  if(hasClub && cl3.length){
+    const cl12 = (CLUBS[t]||[]).filter(c=>!CLUB3.has(c));
+    cards.push({ id:'s1120c', end:'11-20', label:'11/20 동아리', dow:'금', g3:true, title:'동아리 3학년 학생 특기사항 완료', kind:'club', sub:'g3', clubs:cl3,
+      items:[{id:'g3', t:'<b>3학년 학생</b> 특기사항 작성·내용 확인 완료', s:'이 동아리의 3학년 학생만 · 11/20(금)까지'}],
       note:['<b style="color:var(--red)">3학년 학생은 11/30(월) 기준으로 대입전형 자료가 만들어져요.</b> 동아리 3학년 학생 특기사항은 <b>11/20(금)까지</b> 작성·내용 확인을 마쳐요.',
-            '1·2학년 학생 특기사항은 지금처럼 <b>12/14(월)</b>까지예요. 누가기록·이수시간은 모든 학년 <b>12/11(금)</b>이에요.'],
+            `3학년 학생이 있는 내 동아리: <b>${cl3.join(' · ')}</b>`+(cl12.length?` <span class="mnote">(${cl12.join(' · ')}는 3학년 학생 없음)</span>`:''),
+            '같은 동아리의 <b>1·2학년 학생</b>은 <b>12/14 동아리</b> 카드에서 따로 체크해요. 누가기록·이수시간은 모든 학년 <b>12/11(금)</b>이에요.'],
       guide:'<span class="path">[동아리활동관리]</span> {학생부자료기록} 탭 → 3학년 학생 특기사항 입력 → {저장}' });
     const c14 = cards.find(c=>c.id==='s1214');
-    if(c14){ c14.title='동아리 특기사항 완료 (1·2학년 학생)'; c14.note=['<b>3학년 학생</b>은 <b>11/20 동아리</b> 카드에서 먼저 끝내요(11/30 대입전형 자료 기준).'].concat(c14.note); }
+    if(c14){ c14.title='동아리 특기사항 완료 (1·2학년 학생)';
+      c14.items=[{id:'t', t:'<b>1·2학년 학생</b> 특기사항 작성 완료', s:'500자 이내 · 1·2학년 학생이 없는 동아리는 확인 후 체크만 해요'}];
+      c14.note=[`<b>3학년 학생</b>은 <b>11/20 동아리</b> 카드에서 먼저 끝내요(11/30 대입전형 자료 기준) · ${cl3.join(' · ')}`].concat(c14.note); }
   }
   return cards.sort((a,b)=>a.end.localeCompare(b.end));
 }
 /* 3학년이 끼어 있는 교과·동아리 선생님 안내 */
 function g3Info(t){
-  const my=(TEACHERS[t]||[]).filter(a=>a.g===3), clubs=CLUBS[t]||[];
+  const my=(TEACHERS[t]||[]).filter(a=>a.g===3), clubs=clubs3(t);
   const sub3 = SUBT(t).filter(h=>h.g===3);
   return { cls: my.map(a=>`<b>${esc(a.subj)}</b> ${a.classes.map(c=>clsName(3,c)).join(' · ')}`), clubs, sub3, any: my.length>0 || clubs.length>0 || sub3.length>0, has3: my.length>0 };
 }
@@ -1874,7 +1902,7 @@ function adminLogin(){
    📋 담당자 현황표 — 선생님별·날짜(항목)별 체크를 한눈에 보고,
    담당자가 나이스에서 확인한 칸에 '확인' 표시를 남겨요(시트 '담당확인' 탭에 저장 → 다른 기기에서도 보여요)
    ===================================================================== */
-const DASH = { rows:null, marks:{}, at:'', tab:'h', card:'all', q:'', quick:false, only:'', pend:{}, busy:false };
+const DASH = { rows:null, marks:{}, at:'', tab:'todo', tshow:'need', card:'all', q:'', quick:false, only:'', pend:{}, busy:false };
 const dashPw = () => { try{ return sessionStorage.getItem('sgb:adminpw')||''; }catch(e){ return ''; } };
 const dashShort = t => strip(t).replace(/\s*\(.*?\)\s*/g,' ').replace(/교육지원청 제출용 /,'').trim();
 function dashTeachers(tab){
@@ -1904,11 +1932,19 @@ function dashCols(tab){
   if(tab==='h') return H_CARDS.slice().sort((a,b)=>a.end.localeCompare(b.end));
   const seen=new Map();
   dashTeachers('s').forEach(T=>{ const S0=state; state=T.st; try{ sCards().forEach(c=>{ if(!seen.has(c.id)) seen.set(c.id,c); }); }catch(e){} state=S0; });
-  return [...seen.values()].sort((a,b)=>a.end.localeCompare(b.end));
+  const FIX = { s1120c:'동아리 3학년 학생 특기사항', s1214:'동아리 1·2학년 학생 특기사항', s1120:'3학년 과목별 세특', s1209:'1·2학년 과목별 세특' };
+  return [...seen.values()].map(c=>FIX[c.id]?Object.assign({},c,{title:FIX[c.id]}):c).sort((a,b)=>a.end.localeCompare(b.end));
 }
 function dashWhen(v){ v=String(v||''); const m=v.match(/(\d{4})[.\-\/]\s*(\d{1,2})[.\-\/]\s*(\d{1,2})\.?\s*(오전|오후)?\s*(\d{1,2}):(\d{2})/); if(m){ let h=+m[5]; if(m[4]==='오후'&&h<12) h+=12; if(m[4]==='오전'&&h===12) h=0; return `${+m[2]}/${+m[3]} ${String(h).padStart(2,'0')}:${m[6]}`; } const d=new Date(v); return isNaN(d)?v.slice(0,16):`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
 const vKey = (tk, cid) => `${tk}|${cid}`;
-const vOn = (tk, cid) => !!(DASH.marks[vKey(tk,cid)] && DASH.marks[vKey(tk,cid)].on);
+const iKey = (tk, cid, k) => `${tk}|${cid}|${k}`;
+const iOn = (tk, cid, k) => !!(DASH.marks[iKey(tk,cid,k)] && DASH.marks[iKey(tk,cid,k)].on) || !!(DASH.marks[vKey(tk,cid)] && DASH.marks[vKey(tk,cid)].on);
+const dashNoV = (cid, k) => S_PRE.some(p=>p.id===k);           // '작성 안내 확인'은 나이스 확인 대상이 아니에요
+const dashT = tk => [...dashTeachers('h'), ...dashTeachers('s')].find(t=>t.key===tk);
+/* 칸 전체 확인: 칸에 확인 표시 했거나, 항목을 하나씩 모두 확인했을 때 */
+function cardVer(tk, cid, r){ if(DASH.marks[vKey(tk,cid)] && DASH.marks[vKey(tk,cid)].on) return true;
+  if(!r || !r.m || r.n!==r.m) return false; const vi=r.items.filter(i=>!dashNoV(cid,i.k)); return vi.length>0 && vi.every(i=>iOn(tk,cid,i.k)); }
+const vOn = (tk, cid, r) => r ? cardVer(tk,cid,r) : !!(DASH.marks[vKey(tk,cid)] && DASH.marks[vKey(tk,cid)].on);
 async function dashCall(body){
   const r = await withTimeout(fetch(SYNC_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(Object.assign({pw:dashPw()}, body))}), 20000);
   const j = await r.json(); if(!j.ok) throw new Error(j.error||'error'); return j;
@@ -1929,10 +1965,11 @@ function dashOpen(){
     $('#go').onclick = go; $('#pw').onkeydown = e => { if(e.key==='Enter') go(); }; $('#pw').focus(); return;
   }
   app.innerHTML = `<div class="dash">
-    <div class="dhead"><div><h2>📋 담당자 현황표</h2><p class="mini">선생님이 체크한 항목을 날짜별로 보고, <b>나이스에서 확인한 칸</b>에 <b class="vb">✔ 확인</b> 표시를 남겨요. 확인 표시는 시트에 저장돼 다른 기기에서도 보여요.</p></div>
+    <div class="dhead"><div><h2>📋 담당자 현황표</h2><p class="mini"><b>✔ 확인할 일</b>: 선생님이 체크한 것을 <b>누가 · 어디(반·동아리) · 언제</b> 한 줄씩 보여 줘요. 나이스에서 보고 <b>나이스 확인</b>을 누르면 목록에서 빠져요.<br><b>담임교사 표 · 교과교사 표</b>: 선생님 × 날짜로 전체 진행을 한눈에 봐요. 확인 표시는 시트에 저장돼 다른 기기에서도 보여요.</p></div>
       <div class="dact"><span id="dst" class="mini"></span><button class="btn sm" id="dre">🔄 다시 불러오기</button><button class="btn sm" id="dcsv">⬇ 표 내려받기(CSV)</button></div></div>
     <div class="dtool">
-      <div class="seg"><button data-tab="h">🏫 담임교사</button><button data-tab="s">📘 교과교사</button></div>
+      <div class="seg"><button data-tab="todo">✔ 확인할 일</button><button data-tab="h">🏫 담임교사 표</button><button data-tab="s">📘 교과교사 표</button></div>
+      <select id="dshow"><option value="need">확인할 것만</option><option value="ver">확인한 것</option><option value="all">체크된 것 전부</option></select>
       <select id="dcard"></select>
       <select id="donly"><option value="">모든 칸</option><option value="need">확인 필요 (완료 · 미확인)</option><option value="part">진행 중</option><option value="zero">아직 체크 없음</option><option value="ver">확인 완료</option></select>
       <input id="dq" type="search" placeholder="이름·반 찾기">
@@ -1944,6 +1981,7 @@ function dashOpen(){
   </div>
   <div class="dmodal hidden" id="dmodal"><div class="dbox" role="dialog" aria-modal="true"></div></div>`;
   app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ DASH.tab=b.dataset.tab; DASH.card='all'; dashRender(); });
+  $('#dshow').onchange = e => { DASH.tshow=e.target.value; dashRender(); };
   $('#dcard').onchange = e => { DASH.card=e.target.value; dashRender(); };
   $('#donly').onchange = e => { DASH.only=e.target.value; dashRender(); };
   $('#dq').oninput = e => { DASH.q=e.target.value.trim(); dashRender(); };
@@ -1968,7 +2006,7 @@ async function dashLoad(){
 }
 function dashState(r, tk, cid){
   if(!r) return 'na';
-  const v=vOn(tk,cid);
+  const v=vOn(tk,cid,r);
   if(v) return 'ver';
   if(r.m && r.n===r.m) return 'need';
   return r.n ? 'part' : 'zero';
@@ -1976,6 +2014,10 @@ function dashState(r, tk, cid){
 function dashRender(){
   if(!DASH.rows) return;
   app.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on', b.dataset.tab===DASH.tab));
+  $('#dshow').style.display = DASH.tab==='todo' ? '' : 'none'; $('#donly').style.display = DASH.tab==='todo' ? 'none' : '';
+  $('#dquick').closest('label').style.display = DASH.tab==='todo' ? 'none' : '';
+  $('#dtab').classList.toggle('tl', DASH.tab==='todo'); document.querySelector('.dlg').style.display = DASH.tab==='todo' ? 'none' : '';
+  if(DASH.tab==='todo') return dashTodo();
   const cols = dashCols(DASH.tab), sel = $('#dcard');
   sel.innerHTML = `<option value="all">모든 날짜 한눈에</option>` + cols.map(c=>`<option value="${c.id}" ${DASH.card===c.id?'selected':''}>${esc(c.label)} · ${esc(dashShort(c.title))}</option>`).join('');
   const show = DASH.card==='all' ? cols : cols.filter(c=>c.id===DASH.card);
@@ -1991,7 +2033,7 @@ function dashRender(){
   $('#dsum').innerHTML = `<span><b>${list.length}</b>명</span><span>체크 완료 칸 <b>${done}</b> / ${tot}</span><span class="need">확인 필요 <b>${need}</b></span><span class="ver">담당자 확인 <b>${ver}</b></span>${notIn?`<span class="mini">아직 한 번도 들어오지 않은 선생님 ${notIn}명</span>`:''}`;
   const one = DASH.card!=='all';
   let h = `<table class="dt${one?' one':''}"><thead><tr><th class="nm">${DASH.tab==='h'?'반 · 담임':'교과교사'}</th>` +
-    show.map(c=>{ let cd=0, cv=0, ct=0; list.forEach(x=>{ const r=x.ev[c.id]; if(!r) return; ct++; if(r.n===r.m) cd++; if(vOn(x.T.key,c.id)) cv++; });
+    show.map(c=>{ let cd=0, cv=0, ct=0; list.forEach(x=>{ const r=x.ev[c.id]; if(!r) return; ct++; if(r.n===r.m) cd++; if(vOn(x.T.key,c.id,r)) cv++; });
       return `<th data-col="${c.id}" title="${esc(strip(c.title))}"><b>${esc(c.label)}</b><span>${esc(dashShort(c.title))}</span><em>완료 ${cd}/${ct} · 확인 ${cv}</em></th>`; }).join('') + `</tr></thead><tbody>`;
   rowsF.forEach(x=>{
     h += `<tr><th class="nm">${x.T.sub?`<b>${x.T.sub}</b> `:''}${esc(x.T.name)}${x.rec?`<small>${esc(dashWhen(x.rec.saved))} 저장</small>`:'<small class="no">미접속</small>'}</th>`;
@@ -2000,7 +2042,7 @@ function dashRender(){
       if(!r){ h+=`<td class="na">·</td>`; return; }
       const icon = r.n===r.m ? '✅' : r.n ? '🟡' : '⬜';
       const inner = one ? `<ul>${r.items.map(i=>`<li class="${i.on?'y':''}">${i.on?'✓':'·'} ${esc(i.label)}</li>`).join('')}</ul>${r.memo?`<div class="mm">📝 ${esc(r.memo)}</div>`:''}` : '';
-      h += `<td class="c ${st}" data-tk="${esc(x.T.key)}" data-cid="${c.id}"><div class="ct">${icon} ${r.n}/${r.m}${r.memo&&!one?' 📝':''}</div>${vOn(x.T.key,c.id)?'<b class="vb">✔ 확인</b>':''}${inner}</td>`;
+      h += `<td class="c ${st}" data-tk="${esc(x.T.key)}" data-cid="${c.id}"><div class="ct">${icon} ${r.n}/${r.m}${r.memo&&!one?' 📝':''}</div>${vOn(x.T.key,c.id,r)?'<b class="vb">✔ 확인</b>':''}${inner}</td>`;
     });
     h += `</tr>`;
   });
@@ -2010,19 +2052,82 @@ function dashRender(){
   $('#dtab').querySelectorAll('td.c').forEach(td=>td.onclick=()=>{ const tk=td.dataset.tk, cid=td.dataset.cid; if(DASH.quick) dashToggle(tk,cid); else dashDetail(tk,cid); });
   $('#dtab').querySelectorAll('th[data-col]').forEach(th=>th.onclick=()=>{ DASH.card = DASH.card===th.dataset.col?'all':th.dataset.col; dashRender(); });
 }
+/* ✔ 확인할 일: 누가 · 무엇을 · 어디를 · 언제 체크했는지 한 줄씩 */
+function dashTodoData(){
+  const cols = new Map(); [...dashCols('h'), ...dashCols('s')].forEach(c=>{ if(!cols.has(c.id)) cols.set(c.id,c); });
+  const groups = new Map();
+  [...dashTeachers('h'), ...dashTeachers('s')].forEach(T=>{ const rec=DASH.rows[T.key]; if(!rec) return;
+    const ev = dashEval(T, rec.data);
+    Object.entries(ev).forEach(([cid,r])=>{
+      const rows = r.items.filter(i=>i.on && !dashNoV(cid,i.k)).map(i=>({ k:i.k, label:i.label, t:i.t, v:iOn(T.key,cid,i.k), vm:DASH.marks[iKey(T.key,cid,i.k)]||DASH.marks[vKey(T.key,cid)] }));
+      if(!rows.length) return;
+      const c0 = cols.get(cid), c = c0 && c0.end===r.card.end ? c0 : r.card, gk = cid+'@'+r.card.end;   // 3학년은 날짜가 달라 따로 묶어요
+      if(!groups.has(gk)) groups.set(gk, { c, gk, end:r.card.end, list:[] });
+      groups.get(gk).list.push({ T, r, rows, left:r.m-r.n });
+    }); });
+  return [...groups.values()].sort((a,b)=>a.end.localeCompare(b.end));
+}
+function dashTodo(){
+  const fmt = t => { if(!t) return ''; const d=new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+  const q = DASH.q.replace(/\s+/g,''), now = Date.now(), show = DASH.tshow;
+  const G = dashTodoData();
+  const sel = $('#dcard');
+  sel.innerHTML = `<option value="all">모든 날짜</option>` + G.map(g=>`<option value="${g.gk}" ${DASH.card===g.gk?'selected':''}>${esc(g.c.label)} · ${esc(dashShort(g.c.title))}</option>`).join('');
+  let nNeed=0, nVer=0, nNew=0;
+  G.forEach(g=>g.list.forEach(x=>x.rows.forEach(i=>{ if(i.v) nVer++; else { nNeed++; if(i.t && now-i.t < 864e5) nNew++; } })));
+  $('#dsum').innerHTML = `<span class="need">확인할 것 <b>${nNeed}</b>개</span>${nNew?`<span class="new">최근 24시간 새 체크 <b>${nNew}</b></span>`:''}<span class="ver">확인 완료 <b>${nVer}</b>개</span><span class="mini">선생님이 체크한 줄마다 나이스에서 보고 <b class="vb">✔ 확인</b>을 눌러요.</span>`;
+  let h = '<div class="todo">';
+  G.filter(g=>DASH.card==='all'||g.gk===DASH.card).forEach(g=>{
+    const ws = g.list.filter(x=>!q || (x.T.name+x.T.sub).replace(/\s+/g,'').includes(q) || x.rows.some(i=>i.label.replace(/\s+/g,'').includes(q)))
+      .map(x=>Object.assign({}, x, { rows: x.rows.filter(i=> show==='all' || (show==='need' ? !i.v : i.v)) })).filter(x=>x.rows.length)
+      .sort((a,b)=>Math.max(...b.rows.map(i=>i.t||0))-Math.max(...a.rows.map(i=>i.t||0)));
+    if(!ws.length) return;
+    const gn = g.list.reduce((s,x)=>s+x.rows.filter(i=>!i.v).length,0);
+    h += `<div class="tg"><div class="tgh"><div><span class="dd">${esc(g.c.label)}</span><b>${esc(strip(g.c.title))}</b></div><span class="cnt">확인할 것 <b>${gn}</b></span></div>`;
+    ws.forEach(x=>{
+      const hr = x.T.st.role==='homeroom', need = x.rows.filter(i=>!i.v);
+      h += `<div class="tw"><div class="twh"><span class="rl${hr?' h':''}">${hr?'담임':'교과'}</span><span class="who">${hr?esc(x.T.sub)+'반 ':''}${esc(x.T.name)}</span>`
+        + `<span class="mini">${x.left?`아직 ${x.left}개 안 함`:'모두 체크함'}${x.r.memo?` · 📝 ${esc(x.r.memo)}`:''}</span>`
+        + `${need.length>1?`<button class="btn sm all" data-all="${esc(x.T.key)}" data-cid="${g.c.id}" data-gk="${g.gk}">이 선생님 ${need.length}개 모두 ✔</button>`:''}</div>`;
+      x.rows.sort((a,b)=>(b.t||0)-(a.t||0)).forEach(i=>{
+        h += `<div class="tr${i.v?' done':''}"><span class="tm">${fmt(i.t)||'시각 없음'}${!i.v&&i.t&&now-i.t<864e5?'<span class="nw">NEW</span>':''}</span>`
+          + `<span class="wh"><b>${esc(i.label)}</b></span>`
+          + `<button class="vbtn${i.v?' on':''}" data-tk="${esc(x.T.key)}" data-cid="${g.c.id}" data-k="${esc(i.k)}">${i.v?`✔ 확인함<small>${fmt(i.vm&&i.vm.t)}</small>`:'나이스 확인'}</button></div>`;
+      });
+      h += `</div>`;
+    });
+    h += `</div>`;
+  });
+  h += '</div>';
+  if(h==='<div class="todo"></div>') h = `<div class="mini" style="padding:20px">${show==='need'?'지금 확인할 것이 없어요. 👍':'해당하는 체크가 없어요.'}</div>`;
+  $('#dtab').innerHTML = h;
+  $('#dtab').querySelectorAll('.vbtn').forEach(b=>b.onclick=()=>dashIToggle(b.dataset.tk, b.dataset.cid, [b.dataset.k]));
+  $('#dtab').querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{
+    const g = dashTodoData().find(g=>g.gk===b.dataset.gk), x = g && g.list.find(x=>x.T.key===b.dataset.all);
+    if(x) dashIToggle(x.T.key, b.dataset.cid, x.rows.filter(i=>!i.v).map(i=>i.k), true); });
+}
+function dashIToggle(tk, cid, ks, force){
+  const t = Date.now();
+  ks.forEach(k=>{ const key=iKey(tk,cid,k); const on = force ? true : !(DASH.marks[key] && DASH.marks[key].on);
+    DASH.marks[key] = { on, t, by:'담당자' }; DASH.pend[key] = DASH.marks[key]; });
+  // 칸 전체 확인 표시가 있던 칸에서 한 줄을 지우면 칸 표시도 풀어요
+  const ck = vKey(tk,cid); if(DASH.marks[ck] && DASH.marks[ck].on && ks.some(k=>!DASH.marks[iKey(tk,cid,k)].on)){ DASH.marks[ck]={on:false,t,by:'담당자'}; DASH.pend[ck]=DASH.marks[ck]; }
+  dashRender(); dashFlush();
+}
 function dashDetail(tk, cid){
-  const T = dashTeachers(DASH.tab).find(t=>t.key===tk), r = dashEval(T, (DASH.rows[tk]||{}).data)[cid]; if(!r) return;
-  const m = DASH.marks[vKey(tk,cid)], fmt = t => { if(!t) return ''; const d=new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+  const T = dashT(tk), r = dashEval(T, (DASH.rows[tk]||{}).data)[cid]; if(!r) return;
+  const m0 = DASH.marks[vKey(tk,cid)], m = cardVer(tk,cid,r) ? Object.assign({on:true,t:0}, m0&&m0.on?m0:{}) : m0, fmt = t => { if(!t) return ''; const d=new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
   const box = $('#dmodal .dbox');
   box.innerHTML = `<div class="dmh"><div><span class="mini">${esc(r.card.label)} · ${T.sub?T.sub+'반 담임 ':''}${esc(T.name)}</span><h3>${esc(strip(r.card.title))}</h3></div><button class="btn sm" id="dx">닫기</button></div>
-    <ul class="dlist">${r.items.map(i=>`<li class="${i.on?'y':''}"><span class="bx">${i.on?'✓':''}</span><span class="dlb">${esc(i.label)}</span><span class="tm">${i.on?fmt(i.t):''}</span></li>`).join('')}</ul>
+    <ul class="dlist">${r.items.map(i=>`<li class="${i.on?'y':''}"><span class="bx">${i.on?'✓':''}</span><span class="dlb">${esc(i.label)}</span><span class="tm">${i.on?fmt(i.t):''}</span>${i.on&&!dashNoV(cid,i.k)?`<button class="vbtn${iOn(tk,cid,i.k)?' on':''}" data-k="${esc(i.k)}">${iOn(tk,cid,i.k)?'✔ 확인함':'나이스 확인'}</button>`:''}</li>`).join('')}</ul>
     ${r.memo?`<div class="dmemo">📝 선생님 메모: ${esc(r.memo)}</div>`:''}
     ${r.card.guide?`<div class="dguide"><b>나이스에서 확인</b> · ${r.card.guide}</div>`:''}
     <div class="dfoot"><span class="mini">${m&&m.on?`✔ 담당자 확인 ${fmt(m.t)}`:r.n===r.m?'선생님이 모두 체크했어요. 나이스에서 확인한 뒤 눌러 주세요.':`아직 ${r.m-r.n}개 남았어요.`}</span>
       <button class="btn ${m&&m.on?'':'pri'}" id="dv">${m&&m.on?'확인 표시 지우기':'✔ 나이스 확인 완료'}</button></div>`;
   $('#dmodal').classList.remove('hidden');
   $('#dx').onclick = dashClose;
-  $('#dv').onclick = () => { dashToggle(tk, cid); dashDetail(tk, cid); };
+  $('#dv').onclick = () => { if(cardVer(tk,cid,r)){ dashIToggle(tk,cid,r.items.map(i=>i.k).filter(k=>iOn(tk,cid,k)),false); const ck=vKey(tk,cid); DASH.marks[ck]={on:false,t:Date.now(),by:'담당자'}; DASH.pend[ck]=DASH.marks[ck]; r.items.forEach(i=>{ const k2=iKey(tk,cid,i.k); DASH.marks[k2]={on:false,t:Date.now(),by:'담당자'}; DASH.pend[k2]=DASH.marks[k2]; }); dashRender(); dashFlush(); } else dashToggle(tk, cid); dashDetail(tk, cid); };
+  box.querySelectorAll('.vbtn').forEach(b=>b.onclick=()=>{ dashIToggle(tk, cid, [b.dataset.k]); dashDetail(tk, cid); });
 }
 function dashClose(){ $('#dmodal').classList.add('hidden'); }
 function dashToggle(tk, cid){
@@ -2043,9 +2148,16 @@ async function dashFlush(){
   DASH.busy = false; if(Object.keys(DASH.pend).length) setTimeout(dashFlush, 300);
 }
 function dashCsv(){
+  if(DASH.tab==='todo'){
+    const fmt = t => { if(!t) return ''; const d=new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+    const rows=[['날짜','항목','구분','반','이름','어디·무엇','체크 시각','담당자 확인','확인 시각','메모']];
+    dashTodoData().forEach(g=>g.list.forEach(x=>x.rows.forEach(i=>rows.push([g.c.label, strip(g.c.title), x.T.st.role==='homeroom'?'담임':'교과', x.T.sub||'', x.T.name, i.label, fmt(i.t), i.v?'확인':'', i.v?fmt(i.vm&&i.vm.t):'', x.r.memo||'']))));
+    const csv = '\ufeff' + rows.map(r=>r.map(v=>{ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(',')).join('\r\n');
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`체크리스트_확인할일_${nowStr().replace(/[\/: ]/g,'')}.csv`; document.body.appendChild(a); a.click(); a.remove(); return;
+  }
   const cols = dashCols(DASH.tab), rows = [[DASH.tab==='h'?'반':'', '이름', ...cols.map(c=>`${c.label} ${dashShort(c.title)}`)]];
   dashTeachers(DASH.tab).forEach(T=>{ const ev=dashEval(T,(DASH.rows[T.key]||{}).data); if(DASH.tab==='s' && !Object.keys(ev).length) return;
-    rows.push([T.sub, T.name, ...cols.map(c=>{ const r=ev[c.id]; if(!r) return ''; return `${r.n}/${r.m}${vOn(T.key,c.id)?' 확인':''}`; })]); });
+    rows.push([T.sub, T.name, ...cols.map(c=>{ const r=ev[c.id]; if(!r) return ''; return `${r.n}/${r.m}${vOn(T.key,c.id,r)?' 확인':''}`; })]); });
   const csv = '﻿' + rows.map(r=>r.map(v=>{ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(',')).join('\r\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`체크리스트_현황_${DASH.tab==='h'?'담임':'교과'}_${nowStr().replace(/[\/: ]/g,'')}.csv`; document.body.appendChild(a); a.click(); a.remove();
 }
@@ -2301,7 +2413,7 @@ function keysOf(card){
     return ks;
   }
   if(card.kind==='career') return (CAREER[state.teacher]||[]).flatMap(a=>a.classes.map(c=>`${card.items[0].id}${a.g}-${c}`));
-  if(card.kind==='club') return (CLUBS[state.teacher]||[]).flatMap(cl=>card.items.map(i=>clubKey(i,cl)));
+  if(card.kind==='club') return (card.clubs||CLUBS[state.teacher]||[]).flatMap(cl=>card.items.map(i=>clubKey(i,cl)));
   return card.items.map(i=>i.id);
 }
 const itemsOf = card => (card.items||[]).filter(i=>!i.g || state.admin || i.g.includes(state.g));
@@ -2366,7 +2478,7 @@ function board(){
     if(other.length) mine += row('참고', `<span class="mnote">${other.join('·')} 체크는 첫 화면에서 <b>교과교사</b>로 들어가서 해요.</span>`);
   } else {
     mine = row('수업반', (TEACHERS[T]||[]).map(a=>`<div class="msub"><b>${esc(a.subj)}</b>${a.ncs?' <span class="tag">NCS</span>':''} ${a.classes.map(c=>`<span class="tag big${a.g===3?' red':''}">${clsName(a.g,c)}</span>`).join('')}${a.g===3?' <span class="tag red">11/20까지</span>':''}</div>`).join(''))
-      + row('동아리', (CLUBS[T]||[]).map(c=>`<span class="tag ok big">${esc(c)}</span>`).join(''))
+      + row('동아리', (CLUBS[T]||[]).map(c=>`<span class="tag ok big">${esc(c)}</span>${CLUB3.has(c)?'<span class="tag red">3학년 학생 11/20까지</span>':''}`).join(''))
       + row('부담임', SUBT(T).map(h=>`<span class="tag big ${h.g===3?'red':'gray'}">${h.g}학년 ${h.c}반</span>${h.g===3?' <span class="tag red">3학년 · 11/25~26 점검 · 11/27 제출</span>':''}<span class="mnote">담임 ${esc(hrNm(h))}</span>`).join(''))
       + (hr ? row('담임반', `<span class="tag gray big">${hr.g}학년 ${hr.c}반</span><span class="mnote">담임 체크는 <b>담임교사</b>로 들어가서 해요.</span>`) : '');
     if(!mine) mine = row('담당', '<span class="mnote">공통 일정(12/16 교차점검 등)만 있어요.</span>');
@@ -2514,7 +2626,7 @@ function bodyHtml(card){
   } else if(card.kind==='career'){
     h += `<div class="sec"><h4>체크 항목</h4>${(CAREER[state.teacher]||[]).map(a=>a.classes.map(c=>chkHtml(card.id,`${card.items[0].id}${a.g}-${c}`,`<b>${a.g}-${c}반</b> ${strip(card.items[0].t).replace('반별 ','')}`)).join('')).join('')}</div>`;
   } else if(card.kind==='club'){
-    h += `<div class="sec">${(CLUBS[state.teacher]||[]).map((cl,ci)=>`<div class="grp">🎯 ${esc(cl)}</div>`+card.items.map(i=>chkHtml(card.id,clubKey(i,cl),i.t,i.s)).join('')).join('')}</div>`;
+    h += `<div class="sec">${(card.clubs||CLUBS[state.teacher]||[]).map((cl,ci)=>`<div class="grp">🎯 ${esc(cl)}${card.id!=='s1120c'&&CLUB3.has(cl)?' <span class="tag red">3학년 학생은 11/20 카드</span>':''}</div>`+card.items.map(i=>chkHtml(card.id,clubKey(i,cl),i.t,i.s)).join('')).join('')}</div>`;
   } else {
     if(card.vol) h += volHtml(card);
     h += `<div class="sec"><h4>체크 항목</h4>${itemsOf(card).map(i=>chkHtml(card.id,i.id,(i.g?`<span class="tag gray">${i.g.join('·')}학년</span> `:'')+i.t,(i.gs&&!state.admin&&i.gs[state.g])||i.s,false,i.car)).join('')}</div>`;
