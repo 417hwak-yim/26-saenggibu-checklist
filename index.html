@@ -238,6 +238,10 @@ body.qon .top{padding-right:110px}
 .mc-e.c{background:#e7effb;border-color:#1f5fbf;color:#174a96}
 .mc-e.s{background:#e2f4f1;border-color:#0f766e;color:#0b4f49}
 .mc-e.e{background:#eef0f4;border-color:#9aa3b2;color:#56617a}
+.mc-mo{font-weight:800;font-size:14px;margin:12px 0 6px;color:#18202e}.mc-mo:first-of-type{margin-top:4px}
+.mc-mo span{font-weight:600;font-size:12.5px;color:#c2410c;margin-left:6px}
+.mc-c.g3{background:#fff1e0}.mc-r.g3{background:#fff1e0}
+.mc-fz.g3{background:#ffe2c2;color:#9a3412}
 .mc-list{display:none}
 .mc-r{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #e3e8f0}
 .mc-r.focus{background:#fffbe8}
@@ -315,6 +319,16 @@ table.dt .mm{font-size:11.5px;color:#7a5a00;margin-top:3px}
 .dguide{margin-top:10px;font-size:12.5px;color:var(--sub);background:#f5f7fb;border-radius:8px;padding:8px 10px;line-height:1.6}
 .dfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
 @media (max-width:700px){.qk{margin-left:0}.dtab{max-height:none}}
+.g3bar{background:#fff4e5;border:2px solid #e8590c;border-radius:14px;padding:12px 16px;margin-bottom:12px;font-size:14px;line-height:1.6;color:#5c2b06}
+.g3bar .g3t{font-size:16px;color:#c2410c;margin-bottom:2px}
+.g3bar ul{margin:6px 0 0;padding-left:20px}
+.tag.big.red{background:#fdeeec;color:#c0392b;border:1px solid #f0b8b1}
+.g3modal{position:fixed;inset:0;background:rgba(15,20,30,.5);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px}
+.g3box{background:#fff;border-radius:16px;max-width:460px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3);line-height:1.6;font-size:15px}
+.g3box h3{margin:0 0 8px;color:#c2410c;font-size:19px}
+.g3box ul{margin:0 0 8px;padding-left:20px}.g3box li{margin-bottom:4px}
+.g3ok{display:flex;gap:8px;align-items:flex-start;background:#fff4e5;border-radius:10px;padding:10px 12px;font-size:14.5px;cursor:pointer}
+.g3ok input{width:20px;height:20px;flex:0 0 auto;margin-top:2px}
 </style>
 </head>
 <body>
@@ -374,7 +388,7 @@ const HOMEROOMS = [
   { g:2, c:8, name:'이예지', sub:'지호영' },
   { g:3, c:1, name:'이환재', sub:'원희수' },
   { g:3, c:2, name:'박금주', sub:'양정석' },
-  { g:3, c:3, name:'최명숙', sub:'서찬원' },
+  { g:3, c:3, name:'최명숙', sub:'서찬원', prev:'김금희', until:'11/26', from:'11/27' },   // 3-3 담임: 11/26까지 김금희 → 11/27부터 최명숙
   { g:3, c:4, name:'한선숙', sub:'권선희' },
   { g:3, c:5, name:'임주희', sub:'백경민' },
   { g:3, c:6, name:'이영숙', sub:'권희자' },
@@ -1452,6 +1466,7 @@ const H_CARDS = [
 
  { id:'h1207v', end:'12-07', label:'12/7', dow:'월', title:'교육과정 내 봉사활동 입력 확인 (3학년)', comb:'h1207', vol:1, tab:'봉사', g:[3],
    items:[
+    {id:'c', t:'<b>11/30 봉사</b>는 그날 참여한 학생을 확인하고 <b>당일 바로 입력</b>했어요', s:'결재는 나중에 나도 돼요 · 결석·조퇴 등으로 참여하지 않은 학생은 봉사시간을 넣지 않아요'},
     {id:'a', t:'<b>교육과정 내 봉사활동</b> 시간을 반 학생 전원 입력 완료했어요', s:'3학년 총 4시간 · 5/11, 6/22, 10/19, 11/30'},
     {id:'b', t:'<b>교육과정 외 봉사활동</b>도 확인서를 보고 입력했어요', s:'학생이 선발되어 참여한 봉사 등 · 해당 학생이 없으면 체크'}],
    note:['<b>11/30(월)</b>이 3학년 마지막 교육과정 내 봉사활동이에요. 반 학생 <b>전원</b>의 시간이 빠짐없이 입력되었는지 확인해요.',
@@ -1627,7 +1642,50 @@ function sCards(){
     items:subOf.map(h=>({id:`p${h.g}${h.c}`, t:`<b>${h.g}-${h.c}반</b> 자체점검표(온라인) 3검 ○ 표시·서명 제출`, s:'12/23(수) 16:50(퇴청 전)까지'})) }]:[]),
   { id:'s1224', end:'12-24', label:'12/21~24', dow:'월~목', title:'최종 점검 · 오류 보완',
     items:[{id:'a', t:'최종 점검(자료검증) <b>오류 보완</b>을 마쳤어요', s:'12/24(목) 최종 마감'}] });
+  /* 3학년 반 부담임(3검): 11/25~26 점검 · 자체점검표 11/27까지 */
+  const sub3 = SUBT(t).filter(h=>h.g===3);
+  if(sub3.length){
+    const c16 = cards.find(c=>c.id==='s1216'), c23 = cards.find(c=>c.id==='s1223');
+    if(c16) c16.items = c16.items.filter(i=>!/^b3/.test(i.id));
+    if(c23){ c23.items = c23.items.filter(i=>!/^p3/.test(i.id)); if(!c23.items.length) cards.splice(cards.indexOf(c23),1); }
+    cards.push({ id:'s1126', end:'11-26', label:'11/25~26 3학년', dow:'수~목', g3:true, title:'3학년 부담임 학급 3차 점검 · 자체점검표 제출',
+      items: sub3.flatMap(h=>[{id:`b${h.g}${h.c}`, t:`부담임 학급 <b>3-${h.c}반</b> 3차 점검`, s:`담임 ${hrNm(h)} · 11/25(수)~26(목) · 📎A·📎B 봉투를 하루씩 바꿔 봐요`},
+                              {id:`p${h.g}${h.c}`, t:`<b>3-${h.c}반</b> 자체점검표(온라인) 3검 ○ 표시·서명 제출`, s:'11/27(금)까지'}]),
+      note:['<b style="color:var(--red)">3학년은 11/30(월) 기준으로 대입전형 자료가 만들어져서</b> 12/16 집합점검 대신 <b>11/25(수)~26(목)</b>에 점검해요.',
+            '담임이 11/23~24에 1차 점검 후 📎A·📎B 봉투를 넘겨요. 인접 담임(2차)과 시간을 맞춰 봉투를 바꿔 봐요.',
+            '고칠 곳은 형광펜·포스트잇으로 표시해 담임에게 돌려줘요. 담임은 <b>11/27(금)</b>까지 고쳐요.',
+            '자체점검표(온라인)에 3검 ○·서명을 <b>11/27(금)까지</b> 제출해요.'] });
+  }
+  /* 3학년: 11/30(월) 기준 대입전형 자료 → 3학년 세특·동아리(3학년 학생) 특기사항은 11/20(금)까지 */
+  const my = TEACHERS[t]||[], has3 = my.some(a=>a.g===3), has12 = my.some(a=>a.g!==3);
+  const base = cards.find(c=>c.id==='s1209');
+  if(base && has3){
+    const g3cls = my.filter(a=>a.g===3).map(a=>`${a.subj} ${a.classes.map(c=>clsName(3,c)).join('·')}`).join(' / ');
+    const w3=(base.witak||[]).filter(x=>x.g===3), w12=(base.witak||[]).filter(x=>x.g!==3);
+    cards.push(Object.assign({}, base, { id:'s1120', end:'11-20', label:'11/20 3학년', dow:'금', g3:true, grades:[3], witak:w3.length?w3:undefined,
+      title:'3학년 과목별 세부능력 및 특기사항 완료',
+      note:['<b style="color:var(--red)">3학년은 11/30(월) 기준으로 대입전형 자료가 만들어져요.</b> 3학년 반 세특은 <b>11/20(금)까지</b> 작성·내용 확인을 마쳐요. (11/23~26 교차점검 → 11/27 수정 반영)',
+            `내 3학년 수업: <b>${g3cls}</b>`].concat(has12?['<b>1·2학년 반</b>은 <b>12/9(수) 카드</b>에서 따로 체크해요.']:[]).concat(base.note) }));
+    if(has12){ base.grades=[1,2]; base.title='1·2학년 과목별 세부능력 및 특기사항 마감'; base.witak=w12.length?w12:undefined;
+      base.note=['<b>3학년 반</b>은 이 카드에 없어요. <b>11/20 3학년</b> 카드에서 먼저 끝내요(11/30 대입전형 자료 기준).'].concat(base.note); }
+    else cards.splice(cards.indexOf(base),1);
+  }
+  if(hasClub){
+    cards.push({ id:'s1120c', end:'11-20', label:'11/20 동아리', dow:'금', g3:true, title:'동아리 3학년 학생 특기사항 완료', kind:'club', sub:'g3',
+      items:[{id:'g3', t:'<b>3학년 학생</b> 동아리 특기사항 작성 완료', s:'3학년 학생이 없는 동아리는 확인 후 체크만 해요'}],
+      note:['<b style="color:var(--red)">3학년 학생은 11/30(월) 기준으로 대입전형 자료가 만들어져요.</b> 동아리 3학년 학생 특기사항은 <b>11/20(금)까지</b> 작성·내용 확인을 마쳐요.',
+            '1·2학년 학생 특기사항은 지금처럼 <b>12/14(월)</b>까지예요. 누가기록·이수시간은 모든 학년 <b>12/11(금)</b>이에요.'],
+      guide:'<span class="path">[동아리활동관리]</span> {학생부자료기록} 탭 → 3학년 학생 특기사항 입력 → {저장}' });
+    const c14 = cards.find(c=>c.id==='s1214');
+    if(c14){ c14.title='동아리 특기사항 완료 (1·2학년 학생)'; c14.note=['<b>3학년 학생</b>은 <b>11/20 동아리</b> 카드에서 먼저 끝내요(11/30 대입전형 자료 기준).'].concat(c14.note); }
+  }
   return cards.sort((a,b)=>a.end.localeCompare(b.end));
+}
+/* 3학년이 끼어 있는 교과·동아리 선생님 안내 */
+function g3Info(t){
+  const my=(TEACHERS[t]||[]).filter(a=>a.g===3), clubs=CLUBS[t]||[];
+  const sub3 = SUBT(t).filter(h=>h.g===3);
+  return { cls: my.map(a=>`<b>${esc(a.subj)}</b> ${a.classes.map(c=>clsName(3,c)).join(' · ')}`), clubs, sub3, any: my.length>0 || clubs.length>0 || sub3.length>0, has3: my.length>0 };
 }
 
 /* =====================================================================
@@ -1644,6 +1702,7 @@ const store = {
 };
 const clsName = (g,c) => { const [n,grp]=String(c).split('·'); return grp ? `${g}-${n}(${grp})` : `${g}-${n}반`; };
 const SUBT = n => HOMEROOMS.filter(h=>h.sub===n);
+const hrNm = h => h.prev ? `${h.prev}(~${h.until}) → ${h.name}(${h.from}~)` : h.name;   // 담임이 바뀌는 반은 두 이름 모두
 const ALLT = () => [...new Set([...Object.keys(TEACHERS),...Object.keys(CLUBS),...Object.keys(CAREER),...HOMEROOMS.map(h=>h.sub)])];
 const norm = s => (s||'').replace(/\s+/g,'');
 const esc = s => String(s).replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
@@ -1663,17 +1722,17 @@ const nowStr = () => { const d=new Date(); return `${d.getMonth()+1}/${d.getDate
 
 /* ---------- 첫 화면 ---------- */
 /* ===== 12월 생기부 점검 일정 달력 (접었다 펴기) · 교육지원청 체크리스트 열림 시각 ===== */
-const JC_OPEN = Date.UTC(2026, 11, 13, 15, 0, 0);   // 2026-12-14(월) 0:00 한국 시각에 열림
+const JC_OPEN = Date.UTC(2026, 10, 1, 15, 0, 0);    // 연수 때 보여 주려고 지금 열어 둠 (원래: Date.UTC(2026, 11, 13, 15, 0, 0) = 12/14(월) 0시)
 const jcOpen = () => Date.now() >= JC_OPEN;
 function jcDday(){ const k=new Date(Date.now()+9*3600e3); const t=Date.UTC(k.getUTCFullYear(),k.getUTCMonth(),k.getUTCDate()); return Math.round((Date.UTC(2026,11,14)-t)/864e5); }
 function kstMD(){ const k=new Date(Date.now()+9*3600e3); return { y:k.getUTCFullYear(), m:k.getUTCMonth()+1, d:k.getUTCDate() }; }
 /* 종류: d 마감·완료 / c 점검 / s 제출·전달 / e 행사 */
 const MC_EV = {
   3:[['d','진로희망분야 입력 완료','담임'],['d','행발 누가기록 2회 완료','담임'],['c','교육과정 내 봉사 입력 확인(1·2학년)','담임']],
-  7:[['d','행발 특기사항 완료','담임'],['s','창체·진로 특기자료 전달','부서·진로'],['c','교육과정 내 봉사 입력 확인(3학년)','담임']],
-  9:[['d','과세특 마감 (전 학생)','교과']],
+  7:[['d','행발 특기사항 완료','담임'],['s','창체·진로 특기자료 전달','부서·진로']],
+  9:[['d','과세특 완료 (전 학생)','교과']],
   11:[['d','동아리 완료 (누가+이수시간)','동아리'],['e','마지막 동아리 · 발표회']],
-  14:[['d','자율자치·진로·동아리 특기 완료','담임·동아리'],['c','담임 1차 점검','담임'],['s','🔓 교육지원청 체크리스트 열림']],
+  14:[['d','자율자치·진로·동아리 특기 완료','담임·동아리'],['c','담임 1차 점검','담임']],
   15:[['c','담임 1차 점검','담임']],
   16:[['c','집합점검 6·7교시 (📎A·📎B 교대)','전 교사']],
   17:[['e','마지막 자율자치 (7교시)']],
@@ -1691,34 +1750,54 @@ const mcWd = d => MC_WD[new Date(2026,11,d).getDay()];
 const mcEsc = s => String(s).replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 function mcChip(e){ return `<span class="mc-e ${e[0]}">${mcEsc(e[1])}${e[2]?`<small>${mcEsc(e[2])}</small>`:''}</span>`; }
 /* now: {m,d} 오늘(기본: 한국 시각) */
+/* 3학년 11월 일정 (11/30 대입전형 자료 기준) */
+const MC_EV11 = {
+  16:[['c','3학년 작성 · 내용 확인 시작','3학년 교과·담임·동아리']],
+  18:[['s','3학년 특기자료 전달','진로교사→담임 · 부서→임예옥']],
+  20:[['d','3학년 작성 완료','세특 · 동아리 · 행발 · 창체 특기 · 진로희망']],
+  23:[['s','3학년 📎A·📎B 대봉투 배부'],['c','3학년 담임 1차 점검','3학년 담임']],
+  24:[['c','3학년 담임 1차 점검','3학년 담임']],
+  25:[['c','3학년 인접 담임 · 부담임 점검','2차 · 3차']],
+  26:[['c','3학년 인접 담임 · 부담임 점검','2차 · 3차']],
+  27:[['d','3학년 지적사항 수정 완료'],['s','3학년 자체점검표 제출','1·2·3검']],
+  30:[['d','3학년 대입전형 자료 기준일'],['c','3학년 봉사 당일 입력','담임 · 결재는 나중에']]
+};
 function calBox(now){
   now = now || kstMD();
-  const td = (now.y===2026 || now.y==null) && now.m===12 ? now.d : (now.m===11 || (now.y||2026)<2026 ? 0 : 99);
+  const ny = now.y||2026, ord = (m,d) => Date.UTC(2026,m-1,d), T0 = Date.UTC(ny,now.m-1,now.d);
   let open = false; try{ open = localStorage.getItem('mc:open')==='1'; }catch(e){}
-  /* 다음 일정 */
-  const days = Object.keys(MC_EV).map(Number).sort((a,b)=>a-b);
-  const nx = days.find(d => d>=td && MC_EV[d].some(e=>e[0]!=='e'));
+  const ev = (m,d) => (m===11 ? MC_EV11[d] : MC_EV[d]) || [];
+  const wd = (m,d) => MC_WD[new Date(2026,m-1,d).getDay()];
+  /* 다음 일정 (11월 3학년 포함) */
+  const all = [...Object.keys(MC_EV11).map(d=>[11,+d]), ...Object.keys(MC_EV).map(d=>[12,+d])].sort((a,b)=>ord(...a)-ord(...b));
+  const nx = all.find(([m,d]) => ord(m,d)>=T0 && ev(m,d).some(e=>e[0]!=='e'));
   let nxt = '';
-  if(nx){ const main = MC_EV[nx].filter(e=>e[0]!=='e').map(e=>e[1]); const dd = Math.round((Date.UTC(2026,11,nx)-Date.UTC(now.y||2026,now.m-1,now.d))/864e5);
-    nxt = `<span class="mc-nx"><b>${dd===0?'오늘':`D-${dd}`}</b> 12/${nx}(${mcWd(nx)}) ${mcEsc(main[0])}${main.length>1?` 외 ${main.length-1}`:''}</span>`; }
-  const weeks = [[null,1,2,3,4],[7,8,9,10,11],[14,15,16,17,18],[21,22,23,24,25],[28,29,30,31,null]];
-  const MC_KEY = {16:'집합점검일', 24:'최종 마무리'};
-  const cls = d => [d<td?'past':'', d===td?'today':'', MC_KEY[d]?'key':(d>=14&&d<=23?'focus':''), d===25||d>=29?'off':''].filter(Boolean).join(' ');
-  let grid = '<div class="mc-grid"><div class="mc-h">월</div><div class="mc-h">화</div><div class="mc-h">수</div><div class="mc-h">목</div><div class="mc-h">금</div>';
-  weeks.forEach(w=>w.forEach(d=>{
-    if(d==null){ grid += '<div class="mc-c none"></div>'; return; }
-    grid += `<div class="mc-c ${cls(d)}"><b class="mc-n${d===25?' hol':''}">${d}${MC_KEY[d]?`<u>${MC_KEY[d]}</u>`:''}${d===td?'<i>오늘</i>':''}</b>${(MC_EV[d]||[]).map(mcChip).join('')}</div>`;
+  if(nx){ const [m,d]=nx, main = ev(m,d).filter(e=>e[0]!=='e').map(e=>e[1]), dd = Math.round((ord(m,d)-T0)/864e5);
+    nxt = `<span class="mc-nx"><b>${dd===0?'오늘':`D-${dd}`}</b> ${m}/${d}(${wd(m,d)}) ${mcEsc(main[0])}${main.length>1?` 외 ${main.length-1}`:''}</span>`; }
+  const MC_KEY = {'12-16':'집합점검일', '12-24':'최종 마무리', '11-30':'3학년 기준일'};
+  const cls = (m,d) => { const k=`${m}-${d}`, t=ord(m,d);
+    return [t<T0?'past':'', t===T0?'today':'', MC_KEY[k]?'key':(m===12&&d>=14&&d<=23?'focus':(m===11&&d>=16&&d<=26?'g3':'')), m===12&&(d===25||d>=29)?'off':''].filter(Boolean).join(' '); };
+  const cell = (m,d) => { const k=`${m}-${d}`, isT = ord(m,d)===T0;
+    return `<div class="mc-c ${cls(m,d)}"><b class="mc-n${m===12&&d===25?' hol':''}">${m===11&&d===30?'11/30':d}${MC_KEY[k]?`<u>${MC_KEY[k]}</u>`:''}${isT?'<i>오늘</i>':''}</b>${ev(m,d).map(mcChip).join('')}</div>`; };
+  const head = '<div class="mc-h">월</div><div class="mc-h">화</div><div class="mc-h">수</div><div class="mc-h">목</div><div class="mc-h">금</div>';
+  let grid = `<div class="mc-mo">11월 <span>3학년만 · 11/30(월) 대입전형 자료 기준</span></div><div class="mc-grid">${head}`;
+  [[16,17,18,19,20],[23,24,25,26,27]].forEach(w=>w.forEach(d=>{ grid += cell(11,d); }));
+  grid += `</div><div class="mc-mo">12월 <span>전 학년</span></div><div class="mc-grid">${head}`;
+  [[[11,30],1,2,3,4],[7,8,9,10,11],[14,15,16,17,18],[21,22,23,24,25],[28,29,30,31,null]].forEach(w=>w.forEach(x=>{
+    if(x==null){ grid += '<div class="mc-c none"></div>'; return; }
+    grid += Array.isArray(x) ? cell(x[0],x[1]) : cell(12,x);
   }));
   grid += '</div>';
   let list = '<div class="mc-list">';
-  days.filter(d=>d<29).forEach(d=>{ list += `<div class="mc-r ${cls(d)}"><div class="mc-rd">12/${d}<span>${mcWd(d)}</span>${MC_KEY[d]?`<u>${MC_KEY[d]}</u>`:''}${d===td?'<i>오늘</i>':''}</div><div class="mc-rv">${MC_EV[d].map(mcChip).join('')}</div></div>`; });
+  all.filter(([m,d])=>!(m===12&&d>=29)).forEach(([m,d])=>{ const k=`${m}-${d}`;
+    list += `<div class="mc-r ${cls(m,d)}"><div class="mc-rd">${m}/${d}<span>${wd(m,d)}</span>${MC_KEY[k]?`<u>${MC_KEY[k]}</u>`:''}${ord(m,d)===T0?'<i>오늘</i>':''}</div><div class="mc-rv">${ev(m,d).map(mcChip).join('')}</div></div>`; });
   list += '<div class="mc-r off"><div class="mc-rd">12/29~</div><div class="mc-rv"><span class="mc-e e">겨울방학</span></div></div></div>';
   return `<details class="mc" id="mcal"${open?' open':''}>
-  <summary><span class="mc-t">📅 12월 생기부 점검 일정</span>${nxt}<span class="mc-tg"></span></summary>
+  <summary><span class="mc-t">📅 생기부 점검 일정</span>${nxt}<span class="mc-tg"></span></summary>
   <div class="mc-body">
-    <div class="mc-lg"><span class="mc-e d">마감·완료</span><span class="mc-e c">점검</span><span class="mc-e s">제출·전달</span><span class="mc-e e">행사</span><span class="mc-fz">집중 점검 기간 12/14~12/23</span></div>
+    <div class="mc-lg"><span class="mc-e d">마감·완료</span><span class="mc-e c">점검</span><span class="mc-e s">제출·전달</span><span class="mc-e e">행사</span><span class="mc-fz g3">3학년 작성·점검 11/16~11/26</span><span class="mc-fz">집중 점검 기간 12/14~12/23</span></div>
     ${grid}${list}
-    <p class="mc-ft">최종 마무리 <b>12/24(목)</b> · 출결 마감 <b>12/28(월)</b> 방학식 당일 · 교육지원청 체크리스트는 <b>12/14(월)</b>에 열리고 <b>12/23(수) 16:50</b>까지 제출해요.</p>
+    <p class="mc-ft">⚠️ <b>3학년</b>은 작성 내용(세특 · 동아리 3학년 학생 · 행발 · 창체 특기사항 · 진로희망)을 <b style="color:#c0392b">11/20(금)까지</b> 끝내고 11/23~26 교차점검을 해요. 창체 <b>누가기록·이수시간</b>은 3학년도 12월 일정 그대로예요.<br>최종 마무리 <b>12/24(목)</b> · 출결 마감 <b>12/28(월)</b> 방학식 당일 · 교육지원청 체크리스트는 <b>12/16(수) 집합점검일부터 12/23(수) 16:50</b>까지 제출해요.</p>
   </div></details>`;
 }
 function calBind(){ const el=document.getElementById('mcal'); if(el) el.addEventListener('toggle', ()=>{ try{ localStorage.setItem('mc:open', el.open?'1':'0'); }catch(e){} }); }
@@ -1735,7 +1814,7 @@ function home(){
       <em>12/1 ~ 12/28 · 교과교사 / 담임교사 · 항목별 완료일 기준</em>
       <small>항목마다 정해진 <span style="font-weight:800">완료일(기한)에 맞춰</span> 끝낸 일을 체크해요. 체크하면 담당자에게 바로 전달돼요.</small></span><span class="go">들어가기 →</span></button>
     <${jo?'a href="selfcheck.html"':'div aria-disabled="true"'} class="big green${jo?'':' lock'}" id="goJc"><span class="bn">2</span><span class="bt"><b>교육지원청 제출용 체크리스트</b>
-      <em>12/14(월) 열림 · 12/16(수) 집합점검 ~ 12/23(수) 16:50 퇴청 전 · 1검 담임 · 2검 인접 담임 · 3검 부담임</em>
+      <em>12/16(수) 집합점검 ~ 12/23(수) 16:50 퇴청 전 · <span style="color:#c2410c">3학년 반은 11/23(월)~27(금)</span> · 1검 담임 · 2검 인접 담임 · 3검 부담임</em>
       <small>${jo?'문항별 ○ 표시와 손글씨 서명을 제출해요. <span style="font-weight:800">집합점검일부터 12/23 퇴청 전까지 반드시 완료</span>해요.':'아직 열리지 않았어요. <span style="font-weight:800">12/14(월) 0시에 자동으로 열려요.</span> 문항별 ○ 표시와 손글씨 서명을 제출해요.'}</small></span><span class="go">${jo?'들어가기 →':`🔒 12/14(월) 열림<b>D-${jcDday()}</b>`}</span></${jo?'a':'div'}>
   </div>
   ${calBox((()=>{ const t=today(); return {y:t.getFullYear(), m:t.getMonth()+1, d:t.getDate()}; })())}`;
@@ -1799,7 +1878,7 @@ const DASH = { rows:null, marks:{}, at:'', tab:'h', card:'all', q:'', quick:fals
 const dashPw = () => { try{ return sessionStorage.getItem('sgb:adminpw')||''; }catch(e){ return ''; } };
 const dashShort = t => strip(t).replace(/\s*\(.*?\)\s*/g,' ').replace(/교육지원청 제출용 /,'').trim();
 function dashTeachers(tab){
-  if(tab==='h') return HOMEROOMS.map(h=>({ key:`h:${h.g}-${h.c}:${h.name}`, name:h.name, sub:`${h.g}-${h.c}`, st:{role:'homeroom',g:h.g,c:h.c,name:h.name,sub:h.sub} }));
+  if(tab==='h') return HOMEROOMS.map(h=>({ key:`h:${h.g}-${h.c}:${h.name}`, name:hrNm(h), sub:`${h.g}-${h.c}`, st:{role:'homeroom',g:h.g,c:h.c,name:h.name,sub:h.sub} }));
   return ALLT().sort((a,b)=>a.localeCompare(b,'ko')).map(t=>({ key:`s:${t}`, name:t, sub:'', st:{role:'subject',teacher:t,name:t} }));
 }
 function dashLabel(card, k){
@@ -2022,7 +2101,7 @@ function login(role, last){
       const g=+$('#g').value, c=+$('#c').value;
       if(HOMEROOMS.length){
         const hit = HOMEROOMS.find(h=>h.g===g && h.c===c);
-        if(!hit || norm(hit.name)!==norm(name)){ $('#err').textContent=`${g}학년 ${c}반 담임 명단과 이름이 맞지 않아요.`; return; }
+        if(!hit || (norm(hit.name)!==norm(name) && !(hit.prev && norm(hit.prev)===norm(name)))){ $('#err').textContent=`${g}학년 ${c}반 담임 명단과 이름이 맞지 않아요.`; return; }
       }
       state = { role, g, c, name, sub: (HOMEROOMS.find(h=>h.g===g&&h.c===c)||{}).sub||'' };
     } else {
@@ -2190,6 +2269,14 @@ function loadData(){
         if(m && cd===d.s1211 || m && cd===d.s1214){ if(C[+m[2]]){ const nk = clubKey({id:m[1]}, C[+m[2]]); if(!(nk in ch)) ch[nk] = ch[k]; delete ch[k]; moved = true; } }
       }); });
   }
+  if(state.role==='subject' && d.s1209 && d.s1209.checks && (TEACHERS[state.teacher]||[]).some(a=>a.g===3)){
+    const ch=d.s1209.checks, ct=d.s1209.ct||{};
+    Object.keys(ch).forEach(k=>{ if(/^c:.+:3-/.test(k)){ d.s1120=d.s1120||{checks:{},ct:{}}; d.s1120.checks=d.s1120.checks||{}; d.s1120.ct=d.s1120.ct||{};
+      if(!(k in d.s1120.checks)){ d.s1120.checks[k]=ch[k]; if(ct[k]) d.s1120.ct[k]=ct[k]; } delete ch[k]; delete ct[k]; moved=true; } });
+  }
+  if(state.role==='subject'){ ['s1216','s1223'].forEach(cid=>{ const cd=d[cid]; if(!cd||!cd.checks) return;
+    Object.keys(cd.checks).forEach(k=>{ if(/^[bp]3\d+$/.test(k)){ d.s1126=d.s1126||{checks:{},ct:{}}; d.s1126.checks=d.s1126.checks||{}; d.s1126.ct=d.s1126.ct||{};
+      if(!(k in d.s1126.checks)){ d.s1126.checks[k]=cd.checks[k]; if(cd.ct&&cd.ct[k]) d.s1126.ct[k]=cd.ct[k]; } delete cd.checks[k]; if(cd.ct) delete cd.ct[k]; moved=true; } }); }); }
   if(moved && !state.admin) store.set(userKey(), d);
   // 새로 생긴 항목 찾기: 지난번에 본 항목 목록과 비교해요
   const seenKey = 'sgb:seen:' + userKey(), newKey = 'sgb:new:' + userKey(), prev = store.get(seenKey), cur = {};
@@ -2210,7 +2297,7 @@ function keysOf(card){
   if(state.role==='homeroom') return itemsOf(card).map(i=>i.id);
   if(card.kind==='seteuk'){
     const ks = S_PRE.map(p=>p.id);
-    (TEACHERS[state.teacher]||[]).forEach(a=>a.classes.forEach(c=>{ ks.push(sKey(a,c)); }));
+    (TEACHERS[state.teacher]||[]).filter(a=>!card.grades||card.grades.includes(a.g)).forEach(a=>a.classes.forEach(c=>{ ks.push(sKey(a,c)); }));
     return ks;
   }
   if(card.kind==='career') return (CAREER[state.teacher]||[]).flatMap(a=>a.classes.map(c=>`${card.items[0].id}${a.g}-${c}`));
@@ -2218,7 +2305,36 @@ function keysOf(card){
   return card.items.map(i=>i.id);
 }
 const itemsOf = card => (card.items||[]).filter(i=>!i.g || state.admin || i.g.includes(state.g));
-const hCards = () => H_CARDS.filter(c=>!c.g || state.admin || c.g.includes(state.g));
+const G3_NOTE = '<b style="color:var(--red)">3학년은 11/30(월) 기준으로 대입전형 자료가 만들어져서</b> 이 일정이 앞당겨졌어요.';
+const G3_OVR = {
+  h1203:{end:'11-20', label:'11/20', dow:'금', n:'3학년 진로희망분야 · 행발 누가기록 2회는 <b>11/20(금)까지</b> 끝내요.'},
+  h1207:{end:'11-20', label:'11/20', dow:'금', n:'3학년 행동특성 및 종합의견은 <b>11/20(금)까지</b> 작성·내용 확인을 마쳐요.'},
+  h1214:{end:'11-20', label:'11/20', dow:'금', n:'3학년 창체 <b>특기사항</b>(자율자치·진로)은 <b>11/20(금)까지</b> 끝내요. <b>누가기록·이수시간</b>은 1·2학년과 같이 12월(자율자치 12/18 · 진로 12/24)이에요.'},
+  h1215:{end:'11-24', label:'11/23~24', dow:'월~화', n:'<b>11/23(월)</b> 담당자가 3학년 담임에게 📎A·📎B 대봉투를 드려요. 3학년 담임 1차 점검은 <b>11/23(월)~24(화)</b> — 전체반영 → 항목별 출력(현재학년) → 📎A·📎B 봉투에 넣어 <b>11/25(수)</b> 인접 담임·부담임에게 넘겨요.'},
+  h1216:{end:'11-26', label:'11/25~26', dow:'수~목', title:'3학년 교차점검 (2차 인접 담임 · 3차 부담임)', n:'3학년은 12/16 집합점검 대신 <b>11/25(수)~26(목)</b>에 점검해요. 인접 담임·부담임이 시간을 맞춰 📎A·📎B 봉투를 하루씩 바꿔 봐요. 3학년 담임은 <b>인접 반(바로 앞 3학년 반, 1반은 8반)</b>의 2차 점검도 해요.'},
+  h1217:{end:'11-27', label:'11/27 수정', dow:'금', n:'3학년 교차점검 지적사항은 <b>11/27(금)까지</b> 고쳐요. 11/30 대입전형 자료에 들어가요.'},
+  h1207v:{end:'11-30', label:'11/30 봉사', dow:'월', title:'교육과정 내 봉사활동 입력 (3학년 · 11/30 당일)', n:'<b>11/30(월) 봉사는 그날 바로 입력</b>해요. 11/30이 대입전형 자료 기준일이라 다음 날 입력하면 늦어요. <b>결재는 나중에 나도 괜찮아요.</b> 그날 <b>누가 참여했는지</b> 담임이 확인해 두고(결석·조퇴 등으로 빠진 학생 제외) 바로 반영해요.'},
+  h1223:{end:'11-27', label:'11/27', dow:'금', n:'3학년 반 교육지원청 제출용 자체점검표(1검·2검)는 <b>11/23 주(11/27(금)까지)</b>에 제출해요.'}
+};
+function g3Card(c){
+  const o = G3_OVR[c.id]; if(!o) return c;
+  let j = JSON.stringify(c)
+    .split('12/23(수) 16:50(퇴청 전)').join('11/27(금)')
+    .split('담임 확인·수정(~12/18) → <b>12/18 자체 파쇄</b>').join('담임 확인·수정(~11/27) → <b>수정 후 자체 파쇄</b>')
+    .split('12/14(월) 담당자가 담임에게').join('11/23(월) 담당자가 3학년 담임에게')
+    .split('집중 점검 기간: 12/14~12/23').join('3학년 점검 기간: 11/23~11/27')
+    .split('7교시가 끝나면').join('11/26 점검이 끝나면');
+  const x = JSON.parse(j);
+  if(c.id==='h1216') x.note = ['<b>준비물</b>: 우리 반 <b>📎A 봉투 · 📎B 봉투</b>(11/23 배부 · 출력물, 📎B에는 자격증철) · 휴대폰/태블릿(자체점검표 ○·서명) · 형광펜·포스트잇·볼펜(점검 후 반납)',
+      '<b>11/25(수)</b>: 📎A 봉투 → 인접 담임 · 📎B 봉투 → 부담임 (봉투째 전달)',
+      '<b>11/26(목)</b>: 봉투를 서로 바꿔요 — 📎B 봉투 → 인접 담임 · 📎A 봉투 → 부담임 → 반 전체를 2번씩 점검']
+      .concat((x.note||[]).filter(t=>typeof t!=='string' || !/6교시|7교시|준비물/.test(t)));
+  Object.assign(x, {end:o.end, label:o.label, dow:o.dow, g3:true}); if(o.title) x.title=o.title;
+  x.note = [G3_NOTE+' '+o.n].concat(x.note||[]);
+  return x;
+}
+const hCards = () => { const cs = H_CARDS.filter(c=>!c.g || state.admin || c.g.includes(state.g));
+  return (state.g===3 && !state.admin) ? cs.map(g3Card).sort((a,b)=>a.end.localeCompare(b.end)) : cs; };
 const cardsNow = () => state.role==='homeroom' ? hCards() : sCards();
 const isOn = (cid,k) => !!(data[cid] && data[cid].checks && data[cid].checks[k]);
 function cardDone(card){ const ks=keysOf(card); return ks.length>0 && ks.every(k=>isOn(card.id,k)); }
@@ -2244,21 +2360,36 @@ function board(){
   const hr = HOMEROOMS.find(h=>norm(h.name)===norm(T));
   let mine = '';
   if(state.role==='homeroom'){
-    mine = row('담임반', `<span class="tag big">${state.g}학년 ${state.c}반</span>${state.sub?`<span class="mnote">부담임 ${esc(state.sub)}</span>`:''}`);
+    const hh = HOMEROOMS.find(h=>h.g===state.g&&h.c===state.c);
+    mine = row('담임반', `<span class="tag big">${state.g}학년 ${state.c}반</span>${state.sub?`<span class="mnote">부담임 ${esc(state.sub)}</span>`:''}${hh&&hh.prev?`<div class="mnote" style="margin-top:4px;color:#c2410c">👥 담임: <b>${esc(hh.prev)}</b> 선생님(~${hh.until}) → <b>${esc(hh.name)}</b> 선생님(${hh.from}~) · 같은 반 기록으로 이어져요</div>`:''}`);
     const other = [(TEACHERS[T]||[]).length?'수업 세특':'', (CLUBS[T]||[]).length?'동아리':''].filter(Boolean);
     if(other.length) mine += row('참고', `<span class="mnote">${other.join('·')} 체크는 첫 화면에서 <b>교과교사</b>로 들어가서 해요.</span>`);
   } else {
-    mine = row('수업반', (TEACHERS[T]||[]).map(a=>`<div class="msub"><b>${esc(a.subj)}</b>${a.ncs?' <span class="tag">NCS</span>':''} ${a.classes.map(c=>`<span class="tag big">${clsName(a.g,c)}</span>`).join('')}</div>`).join(''))
+    mine = row('수업반', (TEACHERS[T]||[]).map(a=>`<div class="msub"><b>${esc(a.subj)}</b>${a.ncs?' <span class="tag">NCS</span>':''} ${a.classes.map(c=>`<span class="tag big${a.g===3?' red':''}">${clsName(a.g,c)}</span>`).join('')}${a.g===3?' <span class="tag red">11/20까지</span>':''}</div>`).join(''))
       + row('동아리', (CLUBS[T]||[]).map(c=>`<span class="tag ok big">${esc(c)}</span>`).join(''))
-      + row('부담임', SUBT(T).map(h=>`<span class="tag gray big">${h.g}학년 ${h.c}반</span><span class="mnote">담임 ${esc(h.name)}</span>`).join(''))
+      + row('부담임', SUBT(T).map(h=>`<span class="tag big ${h.g===3?'red':'gray'}">${h.g}학년 ${h.c}반</span>${h.g===3?' <span class="tag red">3학년 · 11/25~26 점검 · 11/27 제출</span>':''}<span class="mnote">담임 ${esc(hrNm(h))}</span>`).join(''))
       + (hr ? row('담임반', `<span class="tag gray big">${hr.g}학년 ${hr.c}반</span><span class="mnote">담임 체크는 <b>담임교사</b>로 들어가서 해요.</span>`) : '');
     if(!mine) mine = row('담당', '<span class="mnote">공통 일정(12/16 교차점검 등)만 있어요.</span>');
   }
+  const g3 = state.role==='subject' ? g3Info(T) : {any:false};
+  const g3h = state.role==='homeroom' && state.g===3 && !state.admin;
   app.innerHTML = `
     ${demo?`<div class="demo">미리보기: 오늘을 <b>${demo}</b>로 보고 있어요.</div>`:''}
+    ${g3h?`<div class="g3bar"><div class="g3t">⚠️ <b>3학년은 11월에 먼저 끝내요</b> — 11/30(월) 기준 대입전형 자료</div>
+      <ul><li><b>~11/18(수)</b> 3학년 특기자료 전달 — 진로교사 → 3학년 담임 · 부서별 3학년 창체 특기사항 → 임예옥</li>
+      <li><b>11/20(금)</b> 작성 완료 · 행발 특기·누가 2회 · 창체 특기사항(자율자치·진로) · 진로희망</li>
+      <li><b>11/23(월)</b> 📎A·📎B 대봉투 배부 · <b>11/23(월)~24(화)</b> 담임 1차 점검 → <b>11/25(수)~26(목)</b> 인접 담임 2차 · 부담임 3차 점검 <span class="mnote">(3학년 담임은 바로 앞 3학년 반의 2차 점검도 해요)</span></li>
+      <li><b>11/27(금)</b> 지적사항 수정 · 교육지원청 제출용 자체점검표 1검·2검 제출</li>
+      <li><b>11/30(월)</b> 교육과정 내 봉사 — 그날 <b>참여 학생을 확인</b>하고 <b>당일 바로 입력</b> (결재는 나중에 나도 돼요)</li>
+      <li>창체 <b>누가기록·이수시간</b>, 자격증철, 출결 마감은 1·2학년과 같이 12월 그대로예요.</li>
+      ${state.c===3?'<li>👥 <b>3-3반 담임</b>: 11/26까지 <b>김금희</b> 선생님(1차 점검 11/23~24) → 11/27부터 <b>최명숙</b> 선생님(11/27 수정·자체점검표 제출, 12월 일정). 두 분 모두 이 반으로 들어오면 같은 기록이 이어져요.</li>':''}
+      ${state.c===4?'<li>👥 <b>3-4반 2검(인접 담임)</b>은 11/25~26 점검이라 <b>김금희</b> 선생님(3-3 담임, ~11/26)이 해요.</li>':''}</ul></div>`:''}
+    ${g3.any?`<div class="g3bar"><div class="g3t">⚠️ <b>3학년은 11월에 먼저 끝내요</b> — 11/30(월) 기준 대입전형 자료</div>
+      
+      <ul>${g3.has3?`<li>3학년 <b>과목별 세특</b> → <b>11/20(금)</b> · ${g3.cls.join(' / ')}${(TEACHERS[T]||[]).some(a=>a.g!==3)?' <span class="mnote">(1·2학년 반은 12/9)</span>':''}</li>`:''}${g3.clubs.length?`<li>동아리 <b>3학년 학생 특기사항</b> → <b>11/20(금)</b> · ${g3.clubs.map(esc).join(' · ')} <span class="mnote">(1·2학년 학생 12/14 · 누가·이수시간 12/11)</span></li>`:''}${g3.sub3.length?`<li>3학년 <b>부담임 학급 3차 점검</b> → <b>11/25(수)~26(목)</b> · 자체점검표 3검 <b>11/27(금)까지</b> · ${g3.sub3.map(h=>`3-${h.c}반`).join(' · ')}</li>`:''}</ul></div>`:''}
     ${formOk||state.admin?'':'<div class="demo">시트 연결 전이에요. 체크는 이 기기에 저장되고, 제출은 연결 후 시트에 쌓여요.</div>'}
     ${state.admin?`<div class="adminbar"><b>🔧 관리자 미리보기</b> — 선생님 화면을 그대로 보여 줘요. 체크해도 <b>시트로 전송되지 않아요.</b>
-      <div class="adrow"><label>오늘 날짜로 보기 <input type="date" id="adDay" min="2026-11-20" max="2026-12-31" value="${ADMIN_DAY||''}"></label>
+      <div class="adrow"><label>오늘 날짜로 보기 <input type="date" id="adDay" min="2026-11-01" max="2026-12-31" value="${ADMIN_DAY||''}"></label>
       <button class="btn sm" id="adNow">실제 오늘</button><button class="btn sm" id="adReset">체크 모두 지우기</button></div></div>`
       :`<div class="sendbar">✔ 체크하면 <b>담당자에게 바로 전달</b>돼요. 해제해도 바로 반영돼요.<br><span style="font-size:.92em">${SYNC_URL?`📱 <b>같은 ${state.role==='homeroom'?'담임(학년·반·이름)':'교과교사 이름'}으로 들어오면</b> 다른 기기나 브라우저에서도 이전 체크가 이어져요.`:'📱 체크 기록은 기기마다 따로 저장돼서, <b>다른 기기나 브라우저로 들어오면 이전 체크가 보이지 않습니다.</b>'}</span>${SYNC_URL?`<br><span id="syncst" style="font-size:.88em;color:var(--sub)">${syncText()}</span>`:''}</div>`}
     ${state.admin&&state.role==='homeroom'?'':`<div class="mine"><h4>내 담당</h4>${mine}</div>`}
@@ -2284,6 +2415,32 @@ function board(){
   $('#nextD').onclick = () => { const i=cards.findIndex(c=>c.id===state.sel); if(i<cards.length-1) selectDate(cards[i+1].id); };
   refreshSummary();
   selectDate(spot.id, true);
+  if(g3.any && !state.admin && !store.get('sgb:g3ack:'+T)) g3Modal(T, g3);
+  if(g3h && !store.get('sgb:g3ack:h3:'+T)) g3ModalH(T);
+}
+function g3ModalH(T){
+  const m=document.createElement('div'); m.className='g3modal';
+  m.innerHTML=`<div class="g3box" role="dialog" aria-modal="true"><h3>⚠️ 3학년은 일정이 달라요</h3>
+    <p>3학년은 <b>11/30(월) 기준으로 대입전형 자료</b>가 만들어져서 1·2학년보다 먼저 끝내요.</p>
+    <ul><li><b>~11/18(수)</b> 진로 특기자료 → 담임 · 부서 특기사항 → 임예옥</li><li><b>11/20(금)</b> 행발·창체 특기사항·진로희망 작성 완료</li><li><b>11/23(월)</b> 대봉투 배부 · <b>11/23~24</b> 담임 1차 점검 · <b>11/25~26</b> 인접 담임·부담임 점검</li><li><b>11/27(금)</b> 지적사항 수정 · 자체점검표(1검·2검) 제출</li><li><b>11/30(월)</b> 봉사는 참여 학생 확인 후 <b>당일 입력</b> (결재는 나중에)</li></ul>
+    <p class="mnote" style="margin:0 0 12px">누가기록·이수시간 · 자격증철 · 출결 마감은 12월 그대로예요.</p>
+    <label class="g3ok"><input type="checkbox" id="g3c"> 3학년은 <b>11월에 먼저</b> 끝내야 한다는 것을 확인했어요.</label>
+    <button class="btn pri" id="g3go" disabled style="width:100%;margin-top:10px">확인</button></div>`;
+  document.body.appendChild(m);
+  m.querySelector('#g3c').onchange=e=>{ m.querySelector('#g3go').disabled=!e.target.checked; };
+  m.querySelector('#g3go').onclick=()=>{ store.set('sgb:g3ack:h3:'+T, nowStr()); m.remove(); };
+}
+function g3Modal(T, g3){
+  const m=document.createElement('div'); m.className='g3modal';
+  m.innerHTML=`<div class="g3box" role="dialog" aria-modal="true"><h3>⚠️ 3학년은 일정이 달라요</h3>
+    <p><b>${esc(T)}</b> 선생님은 <b>3학년</b>과 관련된 일이 있어요.<br>3학년은 <b>11/30(월) 기준으로 대입전형 자료</b>가 만들어져서 1·2학년보다 <b style="color:var(--red)">먼저</b> 끝내야 해요. 작성은 <b>11/20(금)</b>, 점검은 <b>11/23 주</b>예요.</p>
+    <ul>${g3.has3?`<li><b>3학년 과목별 세특</b><br><span class="mnote">${g3.cls.join(' / ')}</span></li>`:''}${g3.clubs.length?`<li><b>동아리 3학년 학생 특기사항</b><br><span class="mnote">${g3.clubs.map(esc).join(' · ')}</span></li>`:''}${g3.sub3.length?`<li><b>3학년 부담임 학급 3차 점검 (11/25~26)</b> · 자체점검표 3검 <b>11/27까지</b><br><span class="mnote">${g3.sub3.map(h=>`3-${h.c}반 (담임 ${esc(h.name)})`).join(' · ')}</span></li>`:''}</ul>
+    <p class="mnote" style="margin:0 0 12px">11/23~26 교차점검 → 11/27 수정 반영 · 1·2학년은 지금처럼 12월 일정이에요.</p>
+    <label class="g3ok"><input type="checkbox" id="g3c"> 3학년은 <b>11월에 먼저</b> 끝내야 한다는 것을 확인했어요.</label>
+    <button class="btn pri" id="g3go" disabled style="width:100%;margin-top:10px">확인</button></div>`;
+  document.body.appendChild(m);
+  m.querySelector('#g3c').onchange=e=>{ m.querySelector('#g3go').disabled=!e.target.checked; };
+  m.querySelector('#g3go').onclick=()=>{ store.set('sgb:g3ack:'+T, nowStr()); m.remove(); if(typeof selectDate==='function'){ const c=cardsNow().find(x=>x.id==='s1120')||cardsNow().find(x=>x.id==='s1120c')||cardsNow().find(x=>x.id==='s1126'); if(c) selectDate(c.id); } };
 }
 
 function selectDate(id, first){
@@ -2352,7 +2509,7 @@ function bodyHtml(card){
       <div class="note" style="margin:8px 0"><b>기재 불가</b><ul>${card.ban.map(x=>`<li><span class="no">✕</span> ${x}</li>`).join('')}</ul></div>
       ${chkHtml(card.id,'p1',S_PRE[0].t,S_PRE[0].s)}</div>
       <div class="sec"><h4>반별 세특 입력 ${preDone?'':'<span style="font-weight:600;color:var(--muted)">· 위 확인을 체크하면 열려요</span>'}</h4>
-      ${(TEACHERS[state.teacher]||[]).map((a,ai)=>`<div class="grp">${esc(a.subj)} · ${a.g}학년${a.ncs?' <span class="tag">NCS</span>':''}</div>`
+      ${(TEACHERS[state.teacher]||[]).filter(a=>!card.grades||card.grades.includes(a.g)).map((a,ai)=>`<div class="grp">${esc(a.subj)} · ${a.g}학년${a.ncs?' <span class="tag">NCS</span>':''}</div>`
         + a.classes.map(c=>chkHtml(card.id,sKey(a,c),`<b>${clsName(a.g,c)}</b> 전원 세특 입력 완료`,[a.ncs?'이수한 모든 능력단위를 [능력단위: 능력단위명]으로 기재했는지 함께 확인':'',witakSub(a.g,c)].filter(Boolean).join(' · '),!preDone)).join('')).join('')}</div>`;
   } else if(card.kind==='career'){
     h += `<div class="sec"><h4>체크 항목</h4>${(CAREER[state.teacher]||[]).map(a=>a.classes.map(c=>chkHtml(card.id,`${card.items[0].id}${a.g}-${c}`,`<b>${a.g}-${c}반</b> ${strip(card.items[0].t).replace('반별 ','')}`)).join('')).join('')}</div>`;
@@ -2418,7 +2575,7 @@ function cardText(card){
   const [n,t] = cardCount(card);
   if(state.role==='subject' && card.kind==='seteuk'){
     const cls=[], left=[], ncs=[];
-    (TEACHERS[state.teacher]||[]).forEach((a,ai)=>a.classes.forEach(c=>{
+    (TEACHERS[state.teacher]||[]).filter(a=>!card.grades||card.grades.includes(a.g)).forEach((a,ai)=>a.classes.forEach(c=>{
       const on=isOn(card.id,sKey(a,c)); cls.push(on); if(!on) left.push(clsName(a.g,c).replace('반',''));
       }));
     const done=cls.filter(Boolean).length, nd=ncs.filter(Boolean).length;
@@ -2447,11 +2604,14 @@ function payload(card){
       (CLUBS[state.teacher]||[]).length?'동아리: '+CLUBS[state.teacher].join(','):'',
       SUBT(state.teacher).length?'부담임: '+SUBT(state.teacher).map(h=>`${h.g}-${h.c}`).join(','):''].filter(Boolean).join(' / ');
     const sc = sCards(), se = sc.find(c=>c.id==='s1209');
-    { const pn=S_PRE.filter(p=>isOn('s1209',p.id)).length, miss=[];
+    { const pn=S_PRE.filter(p=>isOn('s1209',p.id)||isOn('s1120',p.id)).length, miss=[];
       v.s1209pre = pn===S_PRE.length?'✅ 완료':'⬜ 미확인'; }
     ['s1209','s1211','s1214','s1216','s1217','s1224'].forEach(id=>{ const c=sc.find(x=>x.id===id); v[id] = c?cardText(c):'—'; });
+    { const c3=sc.find(x=>x.id==='s1120'); if(c3) v.s1209 = (sc.find(x=>x.id==='s1209')?'1·2학년 '+v.s1209+' / ':'')+'3학년(11/20) '+cardText(c3); }
+    { const c3=sc.find(x=>x.id==='s1120c'); if(c3) v.s1214 = (v.s1214||'—')+' / 3학년 학생(11/20) '+cardText(c3); }
+    { const c3=sc.find(x=>x.id==='s1126'); if(c3) v.s1216 = (v.s1216||'—')+' / 3학년 부담임(11/25~27) '+cardText(c3); }
     { const p=sc.find(x=>x.id==='s1223'), f=sc.find(x=>x.id==='s1224'); if(p){ const [a1,b1]=cardCount(p),[a2,b2]=cardCount(f); v.s1224 = mark(a1+a2,b1+b2)+` · 점검표 ${a1===b1?'✅':'⬜'} 최종 ${a2===b2?'✅':'⬜'}`; } }
-    if(!sc.find(x=>x.id==='s1209')) v.s1209pre='—';
+    if(!sc.find(x=>x.id==='s1209') && !sc.find(x=>x.id==='s1120')) v.s1209pre='—';
     [['c1207','career1207'],['c1224','career1224']].forEach(([id,f])=>{ const c=sc.find(x=>x.id===id); v[f] = c?cardText(c):'해당없음'; });
     if(!FORMS.subject.entries.career1207 && (CAREER[state.teacher]||[]).length) v.memo = `[진로 12/7] ${v.career1207} [진로 12/24] ${v.career1224}` + (v.memo?' / '+v.memo:'');
   }
