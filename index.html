@@ -135,6 +135,7 @@ button,input,select{font:inherit;color:inherit}
 
 .sec{margin-top:16px}
 .sec h4{margin:0 0 8px;font-size:14px;color:var(--sub);font-weight:800;letter-spacing:.02em}
+.tag.vok{background:#e8f6ee;color:#15803d;border:1px solid #9fd4b4;font-weight:800}
 .chk{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer;line-height:1.5}
 .chk input{width:22px;height:22px;flex:0 0 auto;margin:1px 0 0;accent-color:var(--acc);cursor:pointer}
 .chk.on{background:var(--okbg);border-color:#a9d9c1}
@@ -2285,6 +2286,11 @@ function verify(key){
    · 항목마다 더 나중에 바꾼 쪽을 따르고(체크·해제 모두), 어느 기기의 체크도 지워지지 않게 합쳐요.
    ===================================================================== */
 const sync = { timer:null, state:'', busy:false };
+/* 담당자가 현황표에서 누른 '나이스 확인' — 선생님 화면에도 보여요 ({cid|k: {on,t}}) */
+let VM = {};
+const vmOn = (cid, k) => !!((VM[cid+'|'+k]||{}).on || (VM[cid]||{}).on);
+const vmCard = card => { const ks=keysOf(card).filter(k=>isOn(card.id,k)); return !!(VM[card.id]||{}).on || (ks.length>0 && ks.length===keysOf(card).length && ks.every(k=>vmOn(card.id,k))); };
+function vmLoad(){ try{ VM = store.get('sgb:vm:'+syncKey(), {}) || {}; }catch(e){ VM={}; } }
 function syncKey(){
   if(state.role==='homeroom'){ const h=HOMEROOMS.find(x=>x.g===state.g&&x.c===state.c); return `h:${state.g}-${state.c}:${h?h.name:state.name}`; }
   return `s:${state.teacher}`;
@@ -2320,6 +2326,7 @@ async function pullRemote(){
     const r = await withTimeout(fetch(`${SYNC_URL}?action=load&key=${encodeURIComponent(key)}&t=${Date.now()}`, {redirect:'follow'}), 12000);
     const j = await r.json(); if(!j.ok) throw new Error(j.error||'load');
     if(key!==syncKey()) return;                                   // 그사이 다른 사람으로 바뀐 경우
+    if(j.marks && typeof j.marks==='object'){ const nv=JSON.stringify(j.marks)!==JSON.stringify(VM); VM=j.marks; store.set('sgb:vm:'+key, VM); if(nv && !state.admin){ const sel=state.sel; board(); if(sel && document.getElementById('card-'+sel)) selectDate(sel, true); } }
     const remote = j.data || {}, merged = mergeData(data, remote);
     if(!sameData(merged, data)){
       const sel = state.sel; data = merged; store.set(userKey(), data);
@@ -2456,7 +2463,7 @@ function cardDone(card){ const ks=keysOf(card); return ks.length>0 && ks.every(k
 function cardCount(card){ const ks=keysOf(card); return [ks.filter(k=>isOn(card.id,k)).length, ks.length]; }
 
 /* ---------- 보드 ---------- */
-function board(){
+function board(){ if(!state.admin && state.role) vmLoad();
   const who = $('#who'); who.classList.remove('hidden');
   who.innerHTML = state.admin
     ? `🔧 <b>관리자 미리보기</b> · ${state.role==='homeroom'?'담임 화면':esc(state.teacher)+' 선생님 화면'} <button class="btn sm" id="out">← 관리자 메뉴</button>`
@@ -2581,7 +2588,7 @@ function renderCard(card, el, isSpot, td){
   el.innerHTML = `
     <button class="ch" type="button"><div class="dt"><b>${card.label}</b><small>${card.dow}</small></div>
       <div class="tt">${isSpot?'<span class="spotlbl">지금 할 일</span>':''}<h3>${card.title}</h3>
-        <div class="meta">${dday(card,td)}<span class="tag ${n===t?'ok':'gray'}">${n===t?'완료 ✓':`${n}/${t}`}</span>${d.dirty?'<span class="tag">전송 중…</span>':d.sent?`<span class="tag ok">기록 ${d.sent}</span>`:''}</div></div>
+        <div class="meta">${dday(card,td)}<span class="tag ${n===t?'ok':'gray'}">${n===t?'완료 ✓':`${n}/${t}`}</span>${!state.admin&&vmCard(card)?'<span class="tag vok">✔ 담당자 나이스 확인</span>':''}${d.dirty?'<span class="tag">전송 중…</span>':d.sent?`<span class="tag ok">기록 ${d.sent}</span>`:''}</div></div>
       </button>
     <div class="cb">${bodyHtml(card)}</div>`;
   bindBody(card, el);
@@ -2589,7 +2596,7 @@ function renderCard(card, el, isSpot, td){
 
 function chkHtml(cid, key, t, s, lock, car){
   const on = isOn(cid,key), nw = NEWK.has(cid+'|'+key);
-  return `<label class="chk${on?' on':''}${lock?' lock':''}"><input type="checkbox" data-k="${key}" ${on?'checked':''} ${lock?'disabled':''}><span class="tx">${nw?'<span class="tag newk">추가됨</span> ':''}${car?'<span class="tag car">진로</span> ':''}${t}${s?`<small>${s}</small>`:''}</span></label>`;
+  return `<label class="chk${on?' on':''}${lock?' lock':''}"><input type="checkbox" data-k="${key}" ${on?'checked':''} ${lock?'disabled':''}><span class="tx">${nw?'<span class="tag newk">추가됨</span> ':''}${car?'<span class="tag car">진로</span> ':''}${t}${on&&!state.admin&&vmOn(cid,key)?' <span class="tag vok">✔ 담당자 나이스 확인</span>':''}${s?`<small>${s}</small>`:''}</span></label>`;
 }
 function shotsHtml(card){
   if(!card.shots) return '';
