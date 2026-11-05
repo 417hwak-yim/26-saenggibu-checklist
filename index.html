@@ -1834,7 +1834,7 @@ function calBox(now){
 }
 function calBind(){ const el=document.getElementById('mcal'); if(el) el.addEventListener('toggle', ()=>{ try{ localStorage.setItem('mc:open', el.open?'1':'0'); }catch(e){} }); }
 
-function home(){
+function home(){ adminView('');
   const jo = jcOpen();
   if(typeof flushPush==='function') flushPush();
   if(typeof clearHere==='function') clearHere();
@@ -1906,7 +1906,9 @@ function adminLogin(){
    📋 담당자 현황표 — 선생님별·날짜(항목)별 체크를 한눈에 보고,
    담당자가 나이스에서 확인한 칸에 '확인' 표시를 남겨요(시트 '담당확인' 탭에 저장 → 다른 기기에서도 보여요)
    ===================================================================== */
-const DASH = { rows:null, marks:{}, at:'', tab:'todo', tshow:'need', card:'all', q:'', quick:false, only:'', pend:{}, busy:false };
+/* 새로고침해도 보던 관리자 화면(현황표·탭)으로 돌아와요 */
+const adminView = v => { try{ v?sessionStorage.setItem('sgb:aview', v):sessionStorage.removeItem('sgb:aview'); }catch(e){} };
+const DASH = { rows:null, marks:{}, at:'', tab:(()=>{ try{ return sessionStorage.getItem('sgb:dtab')||'todo'; }catch(e){ return 'todo'; } })(), tshow:'need', card:'all', q:'', quick:false, only:'', pend:{}, busy:false };
 const dashPw = () => { try{ return sessionStorage.getItem('sgb:adminpw')||''; }catch(e){ return ''; } };
 const dashShort = t => strip(t).replace(/\s*\(.*?\)\s*/g,' ').replace(/교육지원청 제출용 /,'').trim();
 function dashTeachers(tab){
@@ -1954,6 +1956,7 @@ async function dashCall(body){
   const j = await r.json(); if(!j.ok) throw new Error(j.error||'error'); return j;
 }
 function dashOpen(){
+  adminView('dash');
   if(typeof flushPush==='function') flushPush();
   if(typeof clearHere==='function') clearHere();
   state = { role:null }; document.querySelector('.wrap').classList.add('wide');
@@ -1984,7 +1987,7 @@ function dashOpen(){
     <div class="dtab" id="dtab"><div class="mini" style="padding:20px">불러오는 중…</div></div>
   </div>
   <div class="dmodal hidden" id="dmodal"><div class="dbox" role="dialog" aria-modal="true"></div></div>`;
-  app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ DASH.tab=b.dataset.tab; DASH.card='all'; dashRender(); });
+  app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ DASH.tab=b.dataset.tab; DASH.card='all'; try{ sessionStorage.setItem('sgb:dtab', DASH.tab); }catch(e){} dashRender(); });
   $('#dshow').onchange = e => { DASH.tshow=e.target.value; dashRender(); };
   $('#dcard').onchange = e => { DASH.card=e.target.value; dashRender(); };
   $('#donly').onchange = e => { DASH.only=e.target.value; dashRender(); };
@@ -2166,7 +2169,7 @@ function dashCsv(){
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`체크리스트_현황_${DASH.tab==='h'?'담임':'교과'}_${nowStr().replace(/[\/: ]/g,'')}.csv`; document.body.appendChild(a); a.click(); a.remove();
 }
 
-function adminHub(){
+function adminHub(){ adminView('hub');
   if(typeof flushPush==='function') flushPush();
   if(typeof clearHere==='function') clearHere();
   state = { role:null }; ADMIN_DAY = null;
@@ -2790,7 +2793,10 @@ function restoreHere(){
 (()=>{ const q=new URLSearchParams(location.search); let ok=false; try{ ok = sessionStorage.getItem('sgb:adminok')==='1'; }catch(e){}
   /* 바탕화면 '관리자' 바로가기: index.html?admin=1 → 비밀번호 입력 후 관리자 메뉴 */
   if(restoreHere()) return;
+  let av=''; try{ av=sessionStorage.getItem('sgb:aview')||''; }catch(e){}
+  if(ok && av==='dash'){ dashOpen(); return; }                 // 현황표를 보다가 새로고침하면 현황표로
   if(q.get('admin')==='1'){ ok ? adminHub() : adminLogin(); return; }
+  if(ok && av==='hub'){ adminHub(); return; }
   (q.get('hub')==='1' && ok) ? adminHub() : home(); })();
 
 /* =====================================================================
