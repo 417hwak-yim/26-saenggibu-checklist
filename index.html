@@ -1842,11 +1842,11 @@ function home(){
   <div class="hero"><h2>2026학년도 학년말 생기부 체크리스트</h2><p>할 일에 맞는 체크리스트를 골라 주세요.</p><p style="display:inline-block;margin-top:10px;background:#fff4e5;border:1px solid #f3c98b;color:#7a4b00;border-radius:10px;padding:8px 14px;font-size:14px;line-height:1.6">📌 담당자가 <b>일정·내용 등을 일부 수정하거나 추가</b>할 수 있어요. 바뀌어도 이미 체크한 기록은 그대로 남아요.</p></div>
   <div class="bigs">
     <button class="big blue" id="goSchool"><span class="bn">1</span><span class="bt"><b>교내 항목별 체크리스트</b>
-      <em>12/1 ~ 12/28 · 교과교사 / 담임교사 · 항목별 완료일 기준</em>
+      <em>1·2학년 12/1 ~ 12/28 · <span style="color:#c2410c">3학년 작성 완료 11/20(금) · 마감 11/30(월)</span> · 교과교사 / 담임교사 · 항목별 완료일 기준</em>
       <small>항목마다 정해진 <span style="font-weight:800">완료일(기한)에 맞춰</span> 끝낸 일을 체크해요. 체크하면 담당자에게 바로 전달돼요.</small></span><span class="go">들어가기 →</span></button>
     <${jo?'a href="selfcheck.html"':'div aria-disabled="true"'} class="big green${jo?'':' lock'}" id="goJc"><span class="bn">2</span><span class="bt"><b>교육지원청 제출용 체크리스트</b>
       <em>12/16(수) 집합점검 ~ 12/23(수) 16:50 퇴청 전 · <span style="color:#c2410c">3학년 반은 11/23(월)~27(금)</span> · 1검 담임 · 2검 인접 담임 · 3검 부담임</em>
-      <small>${jo?'문항별 ○ 표시와 손글씨 서명을 제출해요. <span style="font-weight:800">집합점검일부터 12/23 퇴청 전까지 반드시 완료</span>해요.':'아직 열리지 않았어요. <span style="font-weight:800">12/14(월) 0시에 자동으로 열려요.</span> 문항별 ○ 표시와 손글씨 서명을 제출해요.'}</small></span><span class="go">${jo?'들어가기 →':`🔒 12/14(월) 열림<b>D-${jcDday()}</b>`}</span></${jo?'a':'div'}>
+      <small>${jo?'문항별 ○ 표시와 손글씨 서명을 제출해요. <span style="font-weight:800">1·2학년은 집합점검일부터 12/23 퇴청 전까지, 3학년 반은 11/27(금)까지 반드시 완료</span>해요.':'아직 열리지 않았어요. <span style="font-weight:800">12/14(월) 0시에 자동으로 열려요.</span> 문항별 ○ 표시와 손글씨 서명을 제출해요.'}</small></span><span class="go">${jo?'들어가기 →':`🔒 12/14(월) 열림<b>D-${jcDday()}</b>`}</span></${jo?'a':'div'}>
   </div>
   ${calBox((()=>{ const t=today(); return {y:t.getFullYear(), m:t.getMonth()+1, d:t.getDate()}; })())}`;
   calBind();
