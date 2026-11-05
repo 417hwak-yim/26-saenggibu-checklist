@@ -354,7 +354,7 @@ table.dt .mm{font-size:11.5px;color:#7a5a00;margin-top:3px}
 <body>
 <div class="wrap">
   <div class="top">
-    <div><div class="brand">신일비즈니스고등학교 · 2026학년도 2학기</div><h1>생기부 체크리스트</h1></div>
+    <div><div class="brand">신일비즈니스고등학교 · 2026학년도 학년말</div><h1>생기부 체크리스트</h1></div>
     <div class="who hidden" id="who"></div>
   </div>
   <div id="app"></div>
@@ -1839,7 +1839,7 @@ function home(){
   if(typeof clearHere==='function') clearHere();
   state = { role:null }; ADMIN_DAY = null;
   app.innerHTML = `
-  <div class="hero"><h2>2026학년도 2학기 생기부 체크리스트</h2><p>할 일에 맞는 체크리스트를 골라 주세요.</p></div>
+  <div class="hero"><h2>2026학년도 학년말 생기부 체크리스트</h2><p>할 일에 맞는 체크리스트를 골라 주세요.</p><p style="display:inline-block;margin-top:10px;background:#fff4e5;border:1px solid #f3c98b;color:#7a4b00;border-radius:10px;padding:8px 14px;font-size:14px;line-height:1.6">📌 담당자가 <b>일정·내용 등을 일부 수정하거나 추가</b>할 수 있어요. 바뀌어도 이미 체크한 기록은 그대로 남아요.</p></div>
   <div class="bigs">
     <button class="big blue" id="goSchool"><span class="bn">1</span><span class="bt"><b>교내 항목별 체크리스트</b>
       <em>12/1 ~ 12/28 · 교과교사 / 담임교사 · 항목별 완료일 기준</em>
