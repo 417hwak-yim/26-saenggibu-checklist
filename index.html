@@ -2253,23 +2253,25 @@ function quiz(key){
     const all=[]; for(const g in CLASS_COUNT) for(let c=1;c<=Math.min(8,CLASS_COUNT[g]);c++) all.push(`${g}-${c}`);
     const wrong = shuffle(all.filter(x=>!mineCls.includes(x) && !avoid.has(x))).slice(0,4);
     const right = mineCls[Math.floor(Math.random()*mineCls.length)];
-    return { q:'선생님이 <b>수업하는 반</b>을 하나 고르세요.', opts:shuffle([right,...wrong]).map(x=>[x, x.replace('-','학년 ')+'반']), ok:x=>mineCls.includes(x) };
+    return { q:'아래 다섯 반 중에서 선생님이 이번 학기에 <b>수업하는 반</b>은 어느 반일까요?', opts:shuffle([right,...wrong]).map(x=>[x, x.replace('-','학년 ')+'반']), ok:x=>mineCls.includes(x) };
   }
   const myClubs = CLUBS[key]||[];
   if(myClubs.length){
     const others = shuffle(Object.entries(CLUBS).filter(([k])=>k!==key).flatMap(([,v])=>v)).slice(0,4);
     const right = myClubs[Math.floor(Math.random()*myClubs.length)];
-    return { q:'선생님이 <b>지도하는 동아리</b>를 하나 고르세요.', opts:shuffle([right,...others]).map(x=>[x,x]), ok:x=>myClubs.includes(x) };
+    return { q:'아래 동아리 중에서 선생님이 <b>지도하는 동아리</b>는 어느 것일까요?', opts:shuffle([right,...others]).map(x=>[x,x]), ok:x=>myClubs.includes(x) };
   }
   const subs = SUBT(key).map(h=>`${h.g}-${h.c}`);
   const all = HOMEROOMS.map(h=>`${h.g}-${h.c}`).filter(x=>!subs.includes(x) && !avoid.has(x));
-  return { q:'선생님이 <b>부담임을 맡은 반</b>을 고르세요.', opts:shuffle([subs[0],...shuffle(all).slice(0,4)]).map(x=>[x, x.replace('-','학년 ')+'반']), ok:x=>subs.includes(x) };
+  return { q:'아래 반 중에서 선생님이 <b>부담임을 맡은 반</b>은 어느 반일까요?', opts:shuffle([subs[0],...shuffle(all).slice(0,4)]).map(x=>[x, x.replace('-','학년 ')+'반']), ok:x=>subs.includes(x) };
 }
 function verify(key){
   if(store.get('sgb:ok:'+key)){ state = { role:'subject', teacher:key, name:key }; enter(); return; }
   const z = quiz(key);
-  app.innerHTML = `<div class="login"><h3>📘 본인 확인</h3>
-    <p style="margin:0 0 12px;color:var(--sub);line-height:1.6"><b style="color:var(--ink)">${esc(key)}</b> 선생님이 맞는지 확인할게요.<br>${z.q}</p>
+  app.innerHTML = `<div class="login"><h3>📘 본인 확인 질문</h3>
+    <p style="margin:0 0 8px;color:var(--sub);line-height:1.6"><b style="color:var(--ink)">${esc(key)}</b> 선생님 본인이 맞는지 확인하는 <b style="color:var(--ink)">질문</b>이에요.</p>
+    <div style="background:var(--accbg);border-radius:12px;padding:14px 16px;margin:0 0 12px;font-size:17px;line-height:1.55;color:var(--ink)"><b style="color:var(--acc)">Q.</b> ${z.q}</div>
+    <p style="margin:0 0 12px;font-size:13px;color:var(--sub);line-height:1.6">보기 중 <b>정답은 하나</b>예요. 맞는 것 하나만 누르세요.<br>※ 고른 반만 보이는 게 아니에요. 들어가면 선생님이 맡은 <b>모든 반·동아리</b>가 체크리스트에 나와요.</p>
     <div class="qopts">${z.opts.map(([v,l])=>`<button class="btn qopt" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>
     <div class="err" id="err"></div>
     <div class="acts"><button class="btn" id="back">← 이름 다시 입력</button></div>
@@ -2277,7 +2279,7 @@ function verify(key){
   $('#back').onclick = () => login('subject', {role:'subject', name:key});
   app.querySelectorAll('.qopt').forEach(b=>b.onclick=()=>{
     if(z.ok(b.dataset.v)){ store.set('sgb:ok:'+key, true); state = { role:'subject', teacher:key, name:key }; enter(); }
-    else { $('#err').textContent='맞지 않아요. 새 보기로 다시 골라 주세요.'; setTimeout(()=>verify(key), 900); }
+    else { $('#err').textContent='정답이 아니에요. 새 보기로 한 번 더 물어볼게요.'; setTimeout(()=>verify(key), 900); }
   });
 }
 
