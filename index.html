@@ -1917,9 +1917,12 @@ function dashTeachers(tab){
   if(tab==='h') return HOMEROOMS.map(h=>({ key:`h:${h.g}-${h.c}:${h.name}`, name:hrNm(h), sub:`${h.g}-${h.c}`, st:{role:'homeroom',g:h.g,c:h.c,name:h.name,sub:h.sub} }));
   return ALLT().sort((a,b)=>a.localeCompare(b,'ko')).map(t=>({ key:`s:${t}`, name:t, sub:'', st:{role:'subject',teacher:t,name:t} }));
 }
+/* 시간표 약칭 → 정식 과목명 (학교교육과정 편제표 기준 · 확인된 것만, 나머지는 약칭 그대로) */
+const SUBJ_FULL = { '3|ERP':'기업 자원 통합 관리', '3|마광':'마케팅과 광고', '3|총무':'총무', '3|사행':'사무 행정', '3|회실':'회계 실무', '3|전실':'전자 상거래 실무', '3|스생':'스포츠 생활', '3|문콘':'문화 콘텐츠 산업 일반', '3|영상':'영상 제작 기초', '3|애콘':'애니메이션 콘텐츠 제작', '3|스콘':'스마트 문화 앱 콘텐츠 제작', '3|빅데':'빅데이터 분석', '3|출판':'출판 편집' };
+const subjFull = (ab,g) => SUBJ_FULL[g+'|'+ab] || ab;
 function dashLabel(card, k){
   const it = (card.items||[]).find(i=>i.id===k);
-  if(card.kind==='seteuk'){ const p=S_PRE.find(x=>x.id===k); if(p) return '작성 안내·맞춤법 확인'; const m=k.match(/^c:(.+):(\d)-(.+)$/); if(m) return `${m[1]} ${m[2]}-${m[3]}반`; }
+  if(card.kind==='seteuk'){ const p=S_PRE.find(x=>x.id===k); if(p) return '작성 안내·맞춤법 확인'; const m=k.match(/^c:(.+):(\d)-(.+)$/); if(m) return `${subjFull(m[1],m[2])} ${m[2]}-${m[3]}반`; }
   if(card.kind==='career'){ const m=k.match(/^[a-z](\d)-(.+)$/); if(m) return `${m[1]}-${m[2]}반`; }
   if(card.kind==='club'){ const i=k.indexOf(':'); if(i>0) return k.slice(i+1); }
   return it ? strip(it.sh||it.t) : k;
@@ -2639,7 +2642,7 @@ function bodyHtml(card){
       <div class="note" style="margin:8px 0"><b>기재 불가</b><ul>${card.ban.map(x=>`<li><span class="no">✕</span> ${x}</li>`).join('')}</ul></div>
       ${chkHtml(card.id,'p1',S_PRE[0].t,S_PRE[0].s)}</div>
       <div class="sec"><h4>반별 세특 입력 ${preDone?'':'<span style="font-weight:600;color:var(--muted)">· 위 확인을 체크하면 열려요</span>'}</h4>
-      ${(TEACHERS[state.teacher]||[]).filter(a=>!card.grades||card.grades.includes(a.g)).map((a,ai)=>`<div class="grp">${esc(a.subj)} · ${a.g}학년${a.ncs?' <span class="tag">NCS</span>':''}</div>`
+      ${(TEACHERS[state.teacher]||[]).filter(a=>!card.grades||card.grades.includes(a.g)).map((a,ai)=>`<div class="grp">${esc(subjFull(a.subj,a.g))} · ${a.g}학년${a.ncs?' <span class="tag">NCS</span>':''}</div>`
         + a.classes.map(c=>chkHtml(card.id,sKey(a,c),`<b>${clsName(a.g,c)}</b> 전원 세특 입력 완료`,[a.ncs?'이수한 모든 능력단위를 [능력단위: 능력단위명]으로 기재했는지 함께 확인':'',witakSub(a.g,c)].filter(Boolean).join(' · '),!preDone)).join('')).join('')}</div>`;
   } else if(card.kind==='career'){
     h += `<div class="sec"><h4>체크 항목</h4>${(CAREER[state.teacher]||[]).map(a=>a.classes.map(c=>chkHtml(card.id,`${card.items[0].id}${a.g}-${c}`,`<b>${a.g}-${c}반</b> ${strip(card.items[0].t).replace('반별 ','')}`)).join('')).join('')}</div>`;
