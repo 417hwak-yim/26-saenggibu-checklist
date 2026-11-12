@@ -371,6 +371,9 @@ table.dt .mm{font-size:11.5px;color:#7a5a00;margin-top:3px}
 .clsr .stt{font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}.stt.ok{background:#dff3e6;color:#1f7a45}.stt.v{background:#bfe6cc;color:#14582f}.stt.no{background:#fbe3e3;color:#a33}
 .clsf{font-size:12px;color:#888;margin-top:8px}.clsmsg{font-size:13px;color:#666;margin-top:10px;background:#f6f7fa;border-radius:10px;padding:8px 10px}
 @media (max-width:560px){.clsr{grid-template-columns:22px 1fr auto}.clsr .tc{display:none}}
+.clsbox.fold{padding:0;overflow:hidden}.clsfold{width:100%;display:flex;align-items:center;gap:10px;background:#fff;border:0;padding:12px 16px;font:inherit;font-size:14.5px;cursor:pointer;text-align:left}
+.clsfold:hover{background:#f7f9fc}.clsfold .okn{color:#1f7a45}.clsfold .non{color:#c0392b}.clsfold .clsdl{font-size:12px;background:#ffe3e3;color:#c0392b;border-radius:999px;padding:2px 8px;font-weight:700}.clsfold .clsar{margin-left:auto;color:#2f6fd0;font-weight:700;font-size:13px}
+.clsb{display:flex;flex-direction:column;gap:6px}
 </style>
 </head>
 <body>
@@ -2587,9 +2590,11 @@ async function clsLoad(force){
   const g=state.g, c=state.c, k=`${g}-${c}`; clsRender();
   if(!SYNC_URL || (CLS[k] && !force && Date.now()-CLS[k].at<60000)) return;
   if(CLS[k]) CLS[k].busy=true; clsRender();
-  try{ const r=await withTimeout(fetch(`${SYNC_URL}?action=class&g=${g}&c=${c}&t=${Date.now()}`,{redirect:'follow'}),15000); const j=await r.json();
-    CLS[k] = j.ok && j.rows ? { at:Date.now(), rows:j.rows } : { at:Date.now(), old:!!j.ping, err:!j.ok }; }
-  catch(e){ CLS[k] = Object.assign({}, CLS[k]||{}, { at:Date.now(), err:true, busy:false }); }
+  let j=null;
+  for(let a=0;a<2 && !j;a++){ try{ const r=await withTimeout(fetch(`${SYNC_URL}?action=class&g=${g}&c=${c}&t=${Date.now()}`,{redirect:'follow'}),20000); j=await r.json(); }catch(e){ if(a===0) await new Promise(r=>setTimeout(r,1500)); } }
+  if(j && j.ok && j.rows) CLS[k] = { at:Date.now(), rows:j.rows };
+  else if(j && j.ping) CLS[k] = { at:Date.now(), old:true };
+  else CLS[k] = Object.assign({}, CLS[k]||{}, { err:true, busy:false });   // 실패해도 이전에 불러온 내용은 그대로 보여 줘요
   clsRender(); }
 function clsRender(){
   const box=$('#clsBox'); if(!box || state.role!=='homeroom') return;
@@ -2602,15 +2607,21 @@ function clsRender(){
   const end = g===3 ? '11-20' : '12-09', dl = g===3 ? '11/20(금)' : '12/9(수)', dd = Math.round((dateOf(end)-today())/864e5);
   const dtx = dd>0?`D-${dd}`:dd===0?'오늘 마감':'마감 지남';
   const msg = st.old ? '<div class="clsmsg">⚙️ 담당자가 체크 기록용 Apps Script를 <b>새 버전으로 배포</b>하면 여기에 보여요.</div>'
-    : st.err && !st.rows ? '<div class="clsmsg">⚠️ 지금은 불러오지 못했어요. 잠시 뒤 🔄를 눌러 주세요.</div>' : !st.rows ? '<div class="clsmsg">☁️ 불러오는 중…</div>' : '';
+    : st.err && !st.rows ? '<div class="clsmsg">⚠️ 연결이 잠시 느려요. 🔄를 누르면 다시 불러와요. (체크리스트 저장과는 상관없어요)</div>' : !st.rows ? '<div class="clsmsg">☁️ 불러오는 중…</div>' : '';
+  let open=false; try{ open=localStorage.getItem('sgb:clsopen')==='1'; }catch(e){}
+  if(!open){ box.classList.add('fold');
+    box.innerHTML = `<button class="clsfold" id="clsTg"><span>📘 <b>우리 반 교과 세특</b> ${st.rows?`<b class="${n===m?'okn':'non'}">${n}/${m}</b> 과목 완료`:st.old?'(배포 대기)':'불러오는 중…'}</span><span class="clsdl">${dl} 마감 · ${dtx}</span><span class="clsar">펼치기 ▾</span></button>`;
+    $('#clsTg').onclick=()=>{ try{ localStorage.setItem('sgb:clsopen','1'); }catch(e){} clsRender(); }; return; }
+  box.classList.remove('fold');
   box.innerHTML = `<div class="clsh"><div class="ring" style="--p:${pct}"><div><b>${st.rows?`${n}/${m}`:'–'}</b><span>과목</span></div></div>
     <div class="clst"><div class="tt">📘 우리 반 교과 세특 진행 현황 <small>${dl} 마감 · ${dtx}</small></div>
     <div class="sub">우리 반(${g}-${c}) 수업에 들어오는 교과 선생님이 체크리스트에 <b>세특 입력 완료</b>를 누르면 ✅로 바뀌어요. <b>보기 전용</b>이라 담임이 체크할 칸은 아니에요.</div></div>
-    <button class="btn sm" id="clsRe" ${st.busy?'disabled':''}>🔄</button></div>
+    <div class="clsb"><button class="btn sm" id="clsRe" ${st.busy?'disabled':''} title="다시 불러오기">🔄</button><button class="btn sm" id="clsUp">접기 ▴</button></div></div>
     ${msg}
     ${st.rows?`<div class="clsl">${subs.map(s=>`<div class="clsr"><span class="ic">${s.on?'✅':'⏳'}</span><span class="nm"><b>${esc(s.full)}</b>${s.full!==s.subj?` <em>(${esc(s.subj)})</em>`:''}${s.grp?` <span class="gtag">${esc(s.grp)}</span>`:''}</span><span class="tc">${esc(s.t)}${s.mine?' <em>(본인)</em>':''}</span><span class="stt ${s.on?(s.v?'v':'ok'):'no'}">${s.on?(s.v?'✔ 담당자 확인':'완료 · '+fmt(s.tm)):'아직'}</span></div>`).join('')}</div>
-    <div class="clsf">${witakOf(g,c).length?'위탁 학생: '+witakOf(g,c).map(w=>`${w.no}번 ${esc(w.nm)} (${w.w?'본교 성적 처리 → 세특 입력':'세특 공백'})`).join(' · ')+' · ':''}${subs.some(x=>x.grp)?'군별 과목은 해당 군 학생만 입력해요.':''}${st.at?` · ${fmt(st.at)} 불러옴`:''}</div>`:''}`;
+    <div class="clsf">${[witakOf(g,c).length?'위탁 학생: '+witakOf(g,c).map(w=>`${w.no}번 ${esc(w.nm)} (${w.w?'본교 성적 처리 → 세특 입력':'세특 공백'})`).join(', '):'', subs.some(x=>x.grp)?'군별 과목은 해당 군 학생만 입력해요.':'', st.at?`${fmt(st.at)} 불러옴`:''].filter(Boolean).join(' · ')}</div>`:''}`;
   const b=$('#clsRe'); if(b) b.onclick=()=>clsLoad(true);
+  const u=$('#clsUp'); if(u) u.onclick=()=>{ try{ localStorage.setItem('sgb:clsopen','0'); }catch(e){} clsRender(); };
 }
 
 /* ---------- 보드 ---------- */
