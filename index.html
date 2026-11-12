@@ -374,6 +374,8 @@ table.dt .mm{font-size:11.5px;color:#7a5a00;margin-top:3px}
 .clsbox.fold{padding:0;overflow:hidden}.clsfold{width:100%;display:flex;align-items:center;gap:10px;background:#fff;border:0;padding:12px 16px;font:inherit;font-size:14.5px;cursor:pointer;text-align:left}
 .clsfold:hover{background:#f7f9fc}.clsfold .okn{color:#1f7a45}.clsfold .non{color:#c0392b}.clsfold .clsdl{font-size:12px;background:#ffe3e3;color:#c0392b;border-radius:999px;padding:2px 8px;font-weight:700}.clsfold .clsar{margin-left:auto;color:#2f6fd0;font-weight:700;font-size:13px}
 .clsb{display:flex;flex-direction:column;gap:6px}
+.cgsel{display:flex;gap:6px;margin:2px 0 10px;position:sticky;top:0;z-index:3;background:#fff;padding:6px 0}.cgsel button{border:1.5px solid #d6dbe4;background:#fff;border-radius:999px;padding:7px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;color:#445}
+.cgsel button.on{background:#2f4a6b;border-color:#2f4a6b;color:#fff}.cbgt{cursor:pointer}.cbgt:hover{background:#e2e7f0}
 </style>
 </head>
 <body>
@@ -2016,7 +2018,7 @@ function dashOpen(){
     <div class="dtab" id="dtab"><div class="mini" style="padding:20px">불러오는 중…</div></div>
   </div>
   <div class="dmodal hidden" id="dmodal"><div class="dbox" role="dialog" aria-modal="true"></div></div>`;
-  app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ DASH.tab=b.dataset.tab; DASH.card='all'; try{ sessionStorage.setItem('sgb:dtab', DASH.tab); }catch(e){} dashRender(); });
+  app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ DASH.tab=b.dataset.tab; DASH.card=b.dataset.tab==='c'?'':'all'; try{ sessionStorage.setItem('sgb:dtab', DASH.tab); }catch(e){} dashRender(); });
   $('#dshow').onchange = e => { DASH.tshow=e.target.value; dashRender(); };
   $('#dcard').onchange = e => { DASH.card=e.target.value; dashRender(); };
   $('#donly').onchange = e => { DASH.only=e.target.value; dashRender(); };
@@ -2054,6 +2056,7 @@ function dashRender(){
   $('#dquick').closest('label').style.display = DASH.tab==='todo' ? 'none' : '';
   $('#dtab').classList.toggle('tl', DASH.tab==='todo'); document.querySelector('.dlg').style.display = DASH.tab==='todo' ? 'none' : '';
   if(DASH.tab==='todo') return dashTodo();
+  $('#dcard').style.display='';
   if(DASH.tab==='c'){ document.querySelector('.dlg').style.display='none'; $('#dquick').closest('label').style.display='none'; return dashClass(); }
   const cols = dashCols(DASH.tab), sel = $('#dcard');
   sel.innerHTML = `<option value="all">모든 날짜 한눈에</option>` + cols.map(c=>`<option value="${c.id}" ${DASH.card===c.id?'selected':''}>${esc(c.label)} · ${esc(dashShort(c.title))}</option>`).join('');
@@ -2191,7 +2194,8 @@ function dashClassData(){
 }
 function dashClass(){
   const D = dashClassData(), sel = $('#dcard'), q = DASH.q.replace(/\s+/g,'');
-  sel.innerHTML = `<option value="all">모든 학년</option>` + [1,2,3].map(g=>`<option value="g${g}" ${DASH.card==='g'+g?'selected':''}>${g}학년</option>`).join('');
+  if(!/^(all|g[123])$/.test(DASH.card)){ let v='all'; try{ v=sessionStorage.getItem('sgb:cgrade')||'all'; }catch(e){} DASH.card=v; }
+  sel.style.display='none';
   const only = DASH.only;
   const L = D.filter(x=>DASH.card==='all' || DASH.card==='g'+x.h.g)
     .filter(x=>!q || (`${x.h.g}-${x.h.c}`+hrNm(x.h)+x.subs.map(s=>s.t+s.subj).join('')).replace(/\s+/g,'').includes(q))
@@ -2205,7 +2209,8 @@ function dashClass(){
   $('#dsum').innerHTML = `<span><b>${L.length}</b>개 반 중 <b style="color:#2e9e5b">${allDone}</b>개 반 모두 완료</span><span class="mini">초록 = 끝 · 노랑 = 일부 · 빨강 = 아직 · 반을 누르면 남은 것을 자세히 봐요.</span>`;
   // ① 반 보드: 한 칸 = 한 반
   const tone = (a,b) => !b ? 'na' : a===b ? 'ok' : a ? 'mid' : 'no';
-  let h = `<div class="cboard">` + [1,2,3].filter(g=>L.some(x=>x.h.g===g)).map(g=>`<div class="cbg"><div class="cbgt">${g}학년</div><div class="cbr">` +
+  const gbar = `<div class="cgsel">${[['all','전체'],['g1','1학년'],['g2','2학년'],['g3','3학년']].map(([v,t])=>`<button data-g="${v}" class="${DASH.card===v?'on':''}">${t}</button>`).join('')}</div>`;
+  let h = gbar + `<div class="cboard">` + [1,2,3].filter(g=>L.some(x=>x.h.g===g)).map(g=>`<div class="cbg"><div class="cbgt">${g}학년</div><div class="cbr">` +
     L.filter(x=>x.h.g===g).map(x=>{ const ht=tone(x.hn,x.hm), st=tone(x.sn,x.subs.length);
       return `<button class="ctile ${full(x)?'all':''}" data-cls="${x.h.g}-${x.h.c}"><b>${x.h.g}-${x.h.c}</b><span class="tn">${esc(hrNm(x.h).replace(/\(.*?\)/g,'').split('→')[0].trim())}</span>
         <span class="tl ${ht}"><i>담임</i>${x.hn}/${x.hm}</span><span class="tl ${st}"><i>교과</i>${x.sn}/${x.subs.length}</span></button>`; }).join('') + `</div></div>`).join('') + `</div>`;
@@ -2220,8 +2225,10 @@ function dashClass(){
       + `<td class="sj ${miss.length?(x.sn?'mid':'no'):'ok'}"><b>${x.sn}/${x.subs.length}</b> ${miss.length?`<span class="miss">남은 과목: ${miss.map(s=>`${esc(s.full)}${s.grp?'('+esc(s.grp)+')':''} <em>${esc(s.t)}</em>`).join(' · ')}</span>`:'<span class="okt">모두 입력 완료</span>'}</td></tr>`;
   });
   h += `</tbody></table>`;
-  if(!L.length) h = `<div class="mini" style="padding:20px">조건에 맞는 반이 없어요.</div>`;
+  if(!L.length) h = gbar + `<div class="mini" style="padding:20px">조건에 맞는 반이 없어요.</div>`;
   $('#dtab').innerHTML = h;
+  $('#dtab').querySelectorAll('.cgsel button').forEach(b=>b.onclick=()=>{ DASH.card=b.dataset.g; try{ sessionStorage.setItem('sgb:cgrade',DASH.card); }catch(e){} dashRender(); $('#dtab').scrollTop=0; });
+  $('#dtab').querySelectorAll('.cbgt').forEach(b=>b.onclick=()=>{ const g='g'+parseInt(b.textContent); DASH.card = DASH.card===g?'all':g; try{ sessionStorage.setItem('sgb:cgrade',DASH.card); }catch(e){} dashRender(); });
   $('#dtab').querySelectorAll('[data-cls]').forEach(el=>el.onclick=()=>dashClassDetail(el.dataset.cls));
 }
 function dashClassDetail(gc){
