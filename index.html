@@ -292,6 +292,10 @@ body.qon .top{padding-right:110px}
 .todo .tr{display:grid;grid-template-columns:132px 1fr auto;gap:10px;align-items:center;padding:6px 14px 6px 30px;font-size:14px}
 .todo .tr:hover{background:#f7f9fc}
 .todo .tr .tm{font-variant-numeric:tabular-nums;color:var(--sub);font-size:12.5px}.todo .tr .tm .nw{display:inline-block;font-size:10.5px;font-weight:800;color:#fff;background:#e5484d;border-radius:4px;padding:0 4px;margin-left:4px}
+.todo .tr .bt{display:flex;gap:6px;justify-content:flex-end}
+.mbtn{height:32px;border-radius:9px;border:1.5px solid #c27c0e;background:#fff;color:#a35f00;font-weight:800;font-size:13px;padding:0 12px;cursor:pointer;white-space:nowrap}.mbtn.on{background:#fff4e0;border-style:dashed}
+.todo .tr.wait{background:#fffaf0}.todo .tr .ms{display:block;font-size:12px;font-weight:700;color:#a35f00;margin-top:2px}.todo .tr .ms .ag{color:#e5484d;font-weight:800}
+#dsum .wt{color:#a35f00;font-weight:700}
 .todo .tr .wh b{font-weight:800}.todo .tr .wh small{display:block;color:var(--muted);font-size:11.5px}
 .todo .tr.done .wh{color:var(--muted)}.todo .tr.done .wh b{color:var(--sub)}
 .vbtn{height:32px;border-radius:9px;border:1.5px solid #1f5fbf;background:#fff;color:#1f5fbf;font-weight:800;font-size:13px;padding:0 12px;cursor:pointer;white-space:nowrap}
@@ -1978,6 +1982,7 @@ function dashCols(tab){
 function dashWhen(v){ v=String(v||''); const m=v.match(/(\d{4})[.\-\/]\s*(\d{1,2})[.\-\/]\s*(\d{1,2})\.?\s*(오전|오후)?\s*(\d{1,2}):(\d{2})/); if(m){ let h=+m[5]; if(m[4]==='오후'&&h<12) h+=12; if(m[4]==='오전'&&h===12) h=0; return `${+m[2]}/${+m[3]} ${String(h).padStart(2,'0')}:${m[6]}`; } const d=new Date(v); return isNaN(d)?v.slice(0,16):`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
 const vKey = (tk, cid) => `${tk}|${cid}`;
 const iKey = (tk, cid, k) => `${tk}|${cid}|${k}`;
+const mKey = (tk, cid, k) => `${tk}|${cid}|${k}|msg`;   // 담당자가 '수정 요청 메시지 보냄'을 누른 줄
 const iOn = (tk, cid, k) => !!(DASH.marks[iKey(tk,cid,k)] && DASH.marks[iKey(tk,cid,k)].on) || !!(DASH.marks[vKey(tk,cid)] && DASH.marks[vKey(tk,cid)].on);
 const dashNoV = (cid, k) => S_PRE.some(p=>p.id===k);           // '작성 안내 확인'은 나이스 확인 대상이 아니에요
 const dashT = tk => [...dashTeachers('h'), ...dashTeachers('s')].find(t=>t.key===tk);
@@ -2006,11 +2011,11 @@ function dashOpen(){
     $('#go').onclick = go; $('#pw').onkeydown = e => { if(e.key==='Enter') go(); }; $('#pw').focus(); return;
   }
   app.innerHTML = `<div class="dash">
-    <div class="dhead"><div><h2>📋 담당자 현황표</h2><p class="mini"><b>✔ 확인할 일</b>: 선생님이 체크한 것을 <b>누가 · 어디(반·동아리) · 언제</b> 한 줄씩 보여 줘요. 나이스에서 보고 <b>나이스 확인</b>을 누르면 목록에서 빠져요.<br><b>담임교사 표 · 교과교사 표</b>: 선생님 × 날짜로 전체 진행을 한눈에 봐요. 확인 표시는 시트에 저장돼 다른 기기에서도 보여요.</p></div>
+    <div class="dhead"><div><h2>📋 담당자 현황표</h2><p class="mini"><b>✔ 확인할 일</b>: 선생님이 체크한 것을 <b>누가 · 어디(반·동아리) · 언제</b> 한 줄씩 보여 줘요. 나이스에서 보고 고칠 게 없으면 <b>✔ 나이스 확인 완료</b>(목록에서 빠져요), 고칠 게 있어 선생님께 메시지를 보냈으면 <b>📩 수정 요청 보냄</b>을 눌러요 — '기다리는 중'으로 따로 보이고, 선생님이 다시 체크하면 알려 줘요.<br><b>담임교사 표 · 교과교사 표</b>: 선생님 × 날짜로 전체 진행을 한눈에 봐요. 확인 표시는 시트에 저장돼 다른 기기에서도 보여요.</p></div>
       <div class="dact"><span id="dst" class="mini"></span><button class="btn sm" id="dre">🔄 다시 불러오기</button><button class="btn sm" id="dcsv">⬇ 표 내려받기(CSV)</button></div></div>
     <div class="dtool">
       <div class="seg"><button data-tab="todo">✔ 확인할 일</button><button data-tab="h">🏫 담임교사 표</button><button data-tab="s">📘 교과교사 표</button><button data-tab="c">🧩 학급별 현황</button></div>
-      <select id="dshow"><option value="need">확인할 것만</option><option value="ver">확인한 것</option><option value="all">체크된 것 전부</option></select>
+      <select id="dshow"><option value="need">확인할 것만</option><option value="fresh">아직 안 본 것</option><option value="wait">수정 요청 보낸 것</option><option value="ver">확인한 것</option><option value="all">체크된 것 전부</option></select>
       <select id="dcard"></select>
       <select id="donly"><option value="">모든 칸</option><option value="need">확인 필요 (완료 · 미확인)</option><option value="part">진행 중</option><option value="zero">아직 체크 없음</option><option value="ver">확인 완료</option></select>
       <input id="dq" type="search" placeholder="이름·반 찾기">
@@ -2102,7 +2107,7 @@ function dashTodoData(){
   [...dashTeachers('h'), ...dashTeachers('s')].forEach(T=>{ const rec=DASH.rows[T.key]; if(!rec) return;
     const ev = dashEval(T, rec.data);
     Object.entries(ev).forEach(([cid,r])=>{
-      const rows = r.items.filter(i=>i.on && !dashNoV(cid,i.k)).map(i=>({ k:i.k, label:i.label, t:i.t, v:iOn(T.key,cid,i.k), vm:DASH.marks[iKey(T.key,cid,i.k)]||DASH.marks[vKey(T.key,cid)] }));
+      const rows = r.items.filter(i=>i.on && !dashNoV(cid,i.k)).map(i=>({ k:i.k, label:i.label, t:i.t, v:iOn(T.key,cid,i.k), vm:DASH.marks[iKey(T.key,cid,i.k)]||DASH.marks[vKey(T.key,cid)], m:(DASH.marks[mKey(T.key,cid,i.k)]||{}).on?DASH.marks[mKey(T.key,cid,i.k)]:null }));
       if(!rows.length) return;
       const c0 = cols.get(cid), c = c0 && c0.end===r.card.end ? c0 : r.card, gk = cid+'@'+r.card.end;   // 3학년은 날짜가 달라 따로 묶어요
       if(!groups.has(gk)) groups.set(gk, { c, gk, end:r.card.end, list:[] });
@@ -2116,26 +2121,28 @@ function dashTodo(){
   const G = dashTodoData();
   const sel = $('#dcard');
   sel.innerHTML = `<option value="all">모든 날짜</option>` + G.map(g=>`<option value="${g.gk}" ${DASH.card===g.gk?'selected':''}>${esc(g.c.label)} · ${esc(dashShort(g.c.title))}</option>`).join('');
-  let nNeed=0, nVer=0, nNew=0;
-  G.forEach(g=>g.list.forEach(x=>x.rows.forEach(i=>{ if(i.v) nVer++; else { nNeed++; if(i.t && now-i.t < 864e5) nNew++; } })));
-  $('#dsum').innerHTML = `<span class="need">확인할 것 <b>${nNeed}</b>개</span>${nNew?`<span class="new">최근 24시간 새 체크 <b>${nNew}</b></span>`:''}<span class="ver">확인 완료 <b>${nVer}</b>개</span><span class="mini">선생님이 체크한 줄마다 나이스에서 보고 <b class="vb">✔ 확인</b>을 눌러요.</span>`;
+  let nNeed=0, nVer=0, nNew=0, nWait=0;
+  G.forEach(g=>g.list.forEach(x=>x.rows.forEach(i=>{ if(i.v) nVer++; else if(i.m) nWait++; else { nNeed++; if(i.t && now-i.t < 864e5) nNew++; } })));
+  $('#dsum').innerHTML = `<span class="need">아직 안 본 것 <b>${nNeed}</b>개</span>${nNew?`<span class="new">최근 24시간 새 체크 <b>${nNew}</b></span>`:''}<span class="wt">📩 수정 요청 보내고 기다리는 중 <b>${nWait}</b>개</span><span class="ver">확인 완료 <b>${nVer}</b>개</span><span class="mini">나이스에서 보고 고칠 게 있으면 메시지를 보낸 뒤 <b>📩 수정 요청 보냄</b>, 고칠 게 없으면 <b class="vb">✔ 나이스 확인 완료</b>(목록에서 사라져요).</span>`;
   let h = '<div class="todo">';
   G.filter(g=>DASH.card==='all'||g.gk===DASH.card).forEach(g=>{
     const ws = g.list.filter(x=>!q || (x.T.name+x.T.sub).replace(/\s+/g,'').includes(q) || x.rows.some(i=>i.label.replace(/\s+/g,'').includes(q)))
-      .map(x=>Object.assign({}, x, { rows: x.rows.filter(i=> show==='all' || (show==='need' ? !i.v : i.v)) })).filter(x=>x.rows.length)
+      .map(x=>Object.assign({}, x, { rows: x.rows.filter(i=> show==='all' || (show==='need' ? !i.v : show==='fresh' ? !i.v&&!i.m : show==='wait' ? !i.v&&!!i.m : i.v)) })).filter(x=>x.rows.length)
       .sort((a,b)=>Math.max(...b.rows.map(i=>i.t||0))-Math.max(...a.rows.map(i=>i.t||0)));
     if(!ws.length) return;
-    const gn = g.list.reduce((s,x)=>s+x.rows.filter(i=>!i.v).length,0);
-    h += `<div class="tg"><div class="tgh"><div><span class="dd">${esc(g.c.label)}</span><b>${esc(strip(g.c.title))}</b></div><span class="cnt">확인할 것 <b>${gn}</b></span></div>`;
+    const gn = g.list.reduce((s,x)=>s+x.rows.filter(i=>!i.v&&!i.m).length,0), gw = g.list.reduce((s,x)=>s+x.rows.filter(i=>!i.v&&i.m).length,0);
+    h += `<div class="tg"><div class="tgh"><div><span class="dd">${esc(g.c.label)}</span><b>${esc(strip(g.c.title))}</b></div><span class="cnt">안 본 것 <b>${gn}</b>${gw?` · 📩 기다리는 중 <b>${gw}</b>`:''}</span></div>`;
     ws.forEach(x=>{
-      const hr = x.T.st.role==='homeroom', need = x.rows.filter(i=>!i.v);
+      const hr = x.T.st.role==='homeroom', need = x.rows.filter(i=>!i.v&&!i.m);
       h += `<div class="tw"><div class="twh"><span class="rl${hr?' h':''}">${hr?'담임':'교과'}</span><span class="who">${hr?esc(x.T.sub)+'반 ':''}${esc(x.T.name)}</span>`
         + `<span class="mini">${x.left?`아직 ${x.left}개 안 함`:'모두 체크함'}${x.r.memo?` · 📝 ${esc(x.r.memo)}`:''}</span>`
         + `${need.length>1?`<button class="btn sm all" data-all="${esc(x.T.key)}" data-cid="${g.c.id}" data-gk="${g.gk}">이 선생님 ${need.length}개 모두 ✔</button>`:''}</div>`;
-      x.rows.sort((a,b)=>(b.t||0)-(a.t||0)).forEach(i=>{
-        h += `<div class="tr${i.v?' done':''}"><span class="tm">${fmt(i.t)||'시각 없음'}${!i.v&&i.t&&now-i.t<864e5?'<span class="nw">NEW</span>':''}</span>`
-          + `<span class="wh"><b>${esc(i.label)}</b></span>`
-          + `<button class="vbtn${i.v?' on':''}" data-tk="${esc(x.T.key)}" data-cid="${g.c.id}" data-k="${esc(i.k)}">${i.v?`✔ 확인함<small>${fmt(i.vm&&i.vm.t)}</small>`:'나이스 확인'}</button></div>`;
+      x.rows.sort((a,b)=>(!!a.m-!!b.m)||(b.t||0)-(a.t||0)).forEach(i=>{
+        const ag = i.m && i.t && i.t > i.m.t;   // 요청을 보낸 뒤 선생님이 다시 체크함 → 다시 볼 차례
+        h += `<div class="tr${i.v?' done':i.m?' wait':''}"><span class="tm">${fmt(i.t)||'시각 없음'}${!i.v&&!i.m&&i.t&&now-i.t<864e5?'<span class="nw">NEW</span>':''}</span>`
+          + `<span class="wh"><b>${esc(i.label)}</b>${!i.v&&i.m?`<span class="ms">📩 ${fmt(i.m.t)} 수정 요청 보냄 · ${ag?'<span class="ag">선생님이 다시 체크했어요 — 다시 확인해요</span>':'선생님이 고치길 기다리는 중'}</span>`:''}</span>`
+          + `<span class="bt">${i.v?'':`<button class="mbtn${i.m?' on':''}" data-tk="${esc(x.T.key)}" data-cid="${g.c.id}" data-k="${esc(i.k)}" title="${i.m?'누르면 요청 보냄 표시를 지워요':'나이스에서 고칠 것을 찾아 선생님께 메시지를 보냈으면 눌러요'}">${i.m?'📩 보냄 취소':'📩 수정 요청 보냄'}</button>`}`
+          + `<button class="vbtn${i.v?' on':''}" data-tk="${esc(x.T.key)}" data-cid="${g.c.id}" data-k="${esc(i.k)}">${i.v?`✔ 확인함<small>${fmt(i.vm&&i.vm.t)}</small>`:'✔ 나이스 확인 완료'}</button></span></div>`;
       });
       h += `</div>`;
     });
@@ -2145,10 +2152,14 @@ function dashTodo(){
   if(h==='<div class="todo"></div>') h = `<div class="mini" style="padding:20px">${show==='need'?'지금 확인할 것이 없어요. 👍':'해당하는 체크가 없어요.'}</div>`;
   $('#dtab').innerHTML = h;
   $('#dtab').querySelectorAll('.vbtn').forEach(b=>b.onclick=()=>dashIToggle(b.dataset.tk, b.dataset.cid, [b.dataset.k]));
+  $('#dtab').querySelectorAll('.mbtn').forEach(b=>b.onclick=()=>dashMsgToggle(b.dataset.tk, b.dataset.cid, b.dataset.k));
   $('#dtab').querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{
     const g = dashTodoData().find(g=>g.gk===b.dataset.gk), x = g && g.list.find(x=>x.T.key===b.dataset.all);
     if(x) dashIToggle(x.T.key, b.dataset.cid, x.rows.filter(i=>!i.v).map(i=>i.k), true); });
 }
+/* 📩 수정 요청 보냄: 나이스에서 고칠 것을 찾아 메시지를 보낸 줄 (기다리는 중으로 따로 보여요) */
+function dashMsgToggle(tk, cid, k){ const key=mKey(tk,cid,k), on=!(DASH.marks[key]&&DASH.marks[key].on);
+  DASH.marks[key]={ on, t:Date.now(), by:'담당자' }; DASH.pend[key]=DASH.marks[key]; dashRender(); dashFlush(); }
 function dashIToggle(tk, cid, ks, force){
   const t = Date.now();
   ks.forEach(k=>{ const key=iKey(tk,cid,k); const on = force ? true : !(DASH.marks[key] && DASH.marks[key].on);
