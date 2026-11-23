@@ -362,8 +362,8 @@ table.dt .mm{font-size:11.5px;color:#7a5a00;margin-top:3px}
 .cboard{display:flex;flex-direction:column;gap:10px;margin:4px 0 14px}.cbg{display:flex;gap:10px;align-items:stretch}.cbgt{flex:0 0 52px;font-weight:800;display:flex;align-items:center;justify-content:center;background:#eef1f6;border-radius:10px;font-size:14px}
 .cbr{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;flex:1}.ctile{border:1.5px solid #dfe3ea;background:#fff;border-radius:12px;padding:8px 8px 7px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:3px;font:inherit}
 .ctile b{font-size:18px}.ctile .tn{font-size:11.5px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ctile .tl{font-size:12.5px;font-weight:700;border-radius:6px;padding:2px 6px;display:flex;justify-content:space-between}.ctile .tl i{font-style:normal;font-weight:500}
-.tl.ok{background:#dff3e6;color:#1f7a45}.tl.mid{background:#fff3cf;color:#8a6400}.tl.no{background:#fbe3e3;color:#a33}.tl.na{background:#f1f2f5;color:#999}.ctile.all{border-color:#2e9e5b;background:#f2fbf5}.ctile:hover{box-shadow:0 4px 14px -6px rgba(0,0,0,.25)}
-.dt.cm td.m{text-align:center;font-weight:800;min-width:62px}.dt.cm td.ok{background:#dff3e6;color:#1f7a45}.dt.cm td.v{background:#bfe6cc;color:#14582f}.dt.cm td.mid{background:#fff3cf;color:#8a6400}.dt.cm td.no{background:#fbe3e3}.dt.cm td.na{color:#bbb}
+.tl.ok{background:#bfe6cc;color:#14582f}.ctile .tl em{font-style:normal;font-size:11px;font-weight:700;margin-right:4px;padding:0 4px;border-radius:4px}.ctile .tl em.wt{background:#dbe8fb;color:#1f5fbf}.ctile .tl em.rq{background:#ffe2c7;color:#b45309}.tl.mid{background:#fff3cf;color:#8a6400}.tl.no{background:#fbe3e3;color:#a33}.tl.na{background:#f1f2f5;color:#999}.ctile.all{border-color:#2e9e5b;background:#f2fbf5}.ctile:hover{box-shadow:0 4px 14px -6px rgba(0,0,0,.25)}
+.dt.cm td.m{text-align:center;font-weight:800;min-width:62px}.dt.cm td.ok{background:#dff3e6;color:#1f7a45}.dt.cm td.v{background:#bfe6cc;color:#14582f}.dt.cm td.mid{background:#fff3cf;color:#8a6400}.dt.cm td.wt{background:#dbe8fb;color:#1f5fbf}.dt.cm td.rq{background:#ffe2c7;color:#b45309}.dt.cm td.m em{font-style:normal;font-size:11.5px}.dt.cm .sl{display:block;line-height:1.5}.dt.cm .sl.rq{color:#b45309}.dt.cm .sl.wt{color:#1f5fbf}.dt.cm .sl em{font-style:normal;color:#888}.lg{display:inline-block;border-radius:5px;padding:1px 6px;margin:0 2px;font-weight:700}.lg.v{background:#bfe6cc;color:#14582f}.lg.wt{background:#dbe8fb;color:#1f5fbf}.lg.rq{background:#ffe2c7;color:#b45309}.lg.no{background:#fbe3e3;color:#a33}.dt.cm td.no{background:#fbe3e3}.dt.cm td.na{color:#bbb}
 .dt.cm td.sj{text-align:left;font-size:13px;min-width:320px}.dt.cm .miss{color:#a33}.dt.cm .miss em{font-style:normal;color:#888}.dt.cm .okt{color:#1f7a45;font-weight:700}.dt.cm tr{cursor:pointer}.dt.cm tr:hover th,.dt.cm tr:hover td{filter:brightness(.97)}.dt.cm tr.all th.nm{background:#e8f6ee}
 @media (max-width:900px){.cbr{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .clsbox{background:#fff;border:1px solid var(--line,#e3e7ee);border-radius:16px;padding:14px 16px;margin:10px 0 12px;box-shadow:0 6px 18px -14px rgba(0,0,0,.3)}
@@ -2194,21 +2194,28 @@ function dashClassData(){
   const evOf = T => { if(!sEv.has(T.key)) sEv.set(T.key, dashEval(T, (DASH.rows[T.key]||{}).data)); return sEv.get(T.key); };
   return HOMEROOMS.map(h=>{
     const TH = dashTeachers('h').find(T=>T.st.g===h.g && T.st.c===h.c), ev = dashEval(TH, (DASH.rows[TH.key]||{}).data);
-    const hr = Object.entries(ev).map(([cid,r])=>({ cid, card:r.card, n:r.n, m:r.m, v:vOn(TH.key,cid,r), left:r.items.filter(i=>!i.on).map(i=>i.label) }))
+    /* 완료 = 담당자 '나이스 확인' (안내 확인 항목은 체크만 하면 완료) · 📩 수정 요청 보냄은 아직 미완료 */
+    const st5 = (tk,cid,i) => { const dn = i.on && (dashNoV(cid,i.k) || iOn(tk,cid,i.k)); if(dn) return 'd';
+      if((DASH.marks[mKey(tk,cid,i.k)]||{}).on) return 'q'; return i.on ? 'w' : 'x'; };
+    const hr = Object.entries(ev).map(([cid,r])=>{ const ss=r.items.map(i=>st5(TH.key,cid,i));
+      return { cid, card:r.card, n:r.n, m:r.m, v:vOn(TH.key,cid,r), vn:ss.filter(z=>z==='d').length, qn:ss.filter(z=>z==='q').length, wn:ss.filter(z=>z==='w').length,
+        left:r.items.filter(i=>!i.on).map(i=>i.label), req:r.items.filter((i,j)=>ss[j]==='q').map(i=>i.label), wait:r.items.filter((i,j)=>ss[j]==='w').map(i=>i.label) }; })
       .sort((a,b)=>a.card.end.localeCompare(b.card.end));
     const subs = [];
     Object.entries(TEACHERS).forEach(([t,L])=>L.forEach(a=>{ if(a.g!==h.g) return;
       a.classes.filter(c=>String(c).split('·')[0]===String(h.c)).forEach(c=>{
         const T = sT.get(t), k = sKey(a,c); let on=false, v=false, tm=0, cid='';
         if(T){ const e=evOf(T); Object.entries(e).forEach(([id,r])=>{ if(r.card.kind!=='seteuk') return; const it=r.items.find(i=>i.k===k); if(it){ cid=id; on=it.on; tm=it.t; v=on&&iOn(T.key,id,k); } }); }
-        subs.push({ t, subj:a.subj, full:subjFull(a.subj,a.g), cls:c, on, v, tm, tk:T?T.key:'', cid, grp:String(c).includes('·')?String(c).split('·')[1]:'' }); }); }));
+        const q = !v && !!(T && cid && (DASH.marks[mKey(T.key,cid,k)]||{}).on);
+        subs.push({ t, subj:a.subj, full:subjFull(a.subj,a.g), cls:c, on, v, q, st:v?'d':q?'q':on?'w':'x', tm, tk:T?T.key:'', cid, grp:String(c).includes('·')?String(c).split('·')[1]:'' }); }); }));
     const car = [];
     Object.entries(CAREER||{}).forEach(([t,L])=>L.forEach(a=>{ if(a.g!==h.g || !a.classes.map(String).includes(String(h.c))) return; const T=sT.get(t); if(!T) return;
       Object.entries(evOf(T)).forEach(([id,r])=>{ if(r.card.kind!=='career') return; r.items.filter(i=>i.k.endsWith(`${h.g}-${h.c}`)).forEach(i=>car.push({ t, label:dashShort(r.card.title), end:r.card.label, on:i.on, v:i.on&&iOn(T.key,id,i.k) })); }); }));
     const CHK = new Set(['h1215','h1216','h1217','h1223']);   // 점검 절차 카드(입력 아님)
     const inp = hr.filter(c=>!CHK.has(c.cid)), chk = hr.filter(c=>CHK.has(c.cid));
     const hn = inp.reduce((s,x)=>s+x.n,0), hm = inp.reduce((s,x)=>s+x.m,0), cn = chk.reduce((s,x)=>s+x.n,0), cm = chk.reduce((s,x)=>s+x.m,0);
-    return { h, TH, rec:DASH.rows[TH.key], hr:inp, chk, cn, cm, hn, hm, subs, sn:subs.filter(x=>x.on).length, car };
+    const hv = inp.reduce((s,x)=>s+x.vn,0), hq = inp.reduce((s,x)=>s+x.qn,0), hw = inp.reduce((s,x)=>s+x.wn,0);
+    return { h, TH, rec:DASH.rows[TH.key], hr:inp, chk, cn, cm, hn, hm, hv, hq, hw, subs, sn:subs.filter(x=>x.on).length, sv:subs.filter(x=>x.v).length, sq:subs.filter(x=>x.q).length, sw:subs.filter(x=>x.st==='w').length, car };
   });
 }
 function dashClass(){
@@ -2223,25 +2230,27 @@ function dashClass(){
   const colNm = c => SH[c.cid] || dashShort(c.card.title).slice(0,8);
   const COLS = []; L.forEach(x=>x.hr.forEach(c=>{ const n=colNm(c); if(!COLS.includes(n)) COLS.push(n); }));
   const ORDER = ['진로희망·행발 누가','행발','창체 특기','봉사','자율 누가·이수','자격증','진로 누가·마무리','출결']; COLS.sort((a,b)=>(ORDER.indexOf(a)+99*(ORDER.indexOf(a)<0))-(ORDER.indexOf(b)+99*(ORDER.indexOf(b)<0)));
-  const full = x => x.hm && x.hn===x.hm && x.subs.length && x.sn===x.subs.length;
+  const full = x => x.hm && x.hv===x.hm && x.subs.length && x.sv===x.subs.length;
   const allDone = L.filter(full).length;
-  $('#dsum').innerHTML = `<span><b>${L.length}</b>개 반 중 <b style="color:#2e9e5b">${allDone}</b>개 반 모두 완료</span><span class="mini">초록 = 끝 · 노랑 = 일부 · 빨강 = 아직 · 반을 누르면 남은 것을 자세히 봐요.</span>`;
+  $('#dsum').innerHTML = `<span><b>${L.length}</b>개 반 중 <b style="color:#2e9e5b">${allDone}</b>개 반 모두 완료</span><span class="mini"><b>완료 = 내가 ‘나이스 확인’ 누른 것</b> · <span class="lg v">✔ 확인 완료</span> <span class="lg wt">🔵 선생님 체크 · 확인 대기</span> <span class="lg rq">📩 수정 요청 보냄 (미완료)</span> <span class="lg no">아직 체크 전</span> · 반을 누르면 자세히 봐요.</span>`;
   // ① 반 보드: 한 칸 = 한 반
   const tone = (a,b) => !b ? 'na' : a===b ? 'ok' : a ? 'mid' : 'no';
   const gbar = `<div class="cgsel">${[['all','전체'],['g1','1학년'],['g2','2학년'],['g3','3학년']].map(([v,t])=>`<button data-g="${v}" class="${DASH.card===v?'on':''}">${t}</button>`).join('')}</div>`;
   let h = gbar + `<div class="cboard">` + [1,2,3].filter(g=>L.some(x=>x.h.g===g)).map(g=>`<div class="cbg"><div class="cbgt">${g}학년</div><div class="cbr">` +
-    L.filter(x=>x.h.g===g).map(x=>{ const ht=tone(x.hn,x.hm), st=tone(x.sn,x.subs.length);
+    L.filter(x=>x.h.g===g).map(x=>{ const ht=tone(x.hv,x.hm), st=tone(x.sv,x.subs.length), bd=(w,q)=>(w?`<em class="wt">🔵${w}</em>`:'')+(q?`<em class="rq">📩${q}</em>`:'');
       return `<button class="ctile ${full(x)?'all':''}" data-cls="${x.h.g}-${x.h.c}"><b>${x.h.g}-${x.h.c}</b><span class="tn">${esc(hrNm(x.h).replace(/\(.*?\)/g,'').split('→')[0].trim())}</span>
-        <span class="tl ${ht}"><i>담임</i>${x.hn}/${x.hm}</span><span class="tl ${st}"><i>교과</i>${x.sn}/${x.subs.length}</span></button>`; }).join('') + `</div></div>`).join('') + `</div>`;
+        <span class="tl ${ht}"><i>담임</i><span>${bd(x.hw,x.hq)}<b>${x.hv}/${x.hm}</b></span></span><span class="tl ${st}"><i>교과</i><span>${bd(x.sw,x.sq)}<b>${x.sv}/${x.subs.length}</b></span></span></button>`; }).join('') + `</div></div>`).join('') + `</div>`;
   // ② 표: 반 × 항목 (칸 하나 = 체크 완료 여부)
-  const mk = (a,b,v) => !b ? '<td class="m na">·</td>' : `<td class="m ${a===b?(v?'v':'ok'):a?'mid':'no'}">${a===b?(v?'✔':'✓'):a?`${a}/${b}`:''}</td>`;
+  const mk = o => !o.m ? '<td class="m na">·</td>' : o.d===o.m ? '<td class="m v">✔</td>'
+    : `<td class="m ${o.q?'rq':o.w?'wt':o.d?'mid':'no'}">${o.d||o.q||o.w?`<b>${o.d}/${o.m}</b>`:''}${o.w?` <em>🔵${o.w}</em>`:''}${o.q?` <em>📩${o.q}</em>`:''}</td>`;
   h += `<table class="dt cm"><thead><tr><th class="nm">반 · 담임</th>${COLS.map(n=>`<th>${esc(n)}</th>`).join('')}<th class="sj">2학기 교과 세특</th></tr></thead><tbody>`;
   L.forEach(x=>{
-    const by = {}; x.hr.forEach(c=>{ const n=colNm(c); by[n]=by[n]||{n:0,m:0,v:true}; by[n].n+=c.n; by[n].m+=c.m; by[n].v=by[n].v&&c.v; });
-    const miss = x.subs.filter(s=>!s.on);
+    const by = {}; x.hr.forEach(c=>{ const n=colNm(c); by[n]=by[n]||{d:0,w:0,q:0,m:0}; by[n].d+=c.vn; by[n].w+=c.wn; by[n].q+=c.qn; by[n].m+=c.m; });
+    const SL = st => x.subs.filter(s=>s.st===st).map(s=>`${esc(s.full)}${s.grp?'('+esc(s.grp)+')':''} <em>${esc(s.t)}</em>`).join(' · ');
+    const sAll = x.subs.length && x.sv===x.subs.length;
     h += `<tr data-cls="${x.h.g}-${x.h.c}" class="${full(x)?'all':''}"><th class="nm"><b>${x.h.g}-${x.h.c}</b> ${esc(hrNm(x.h))}${x.rec?'':'<small class="no">미접속</small>'}</th>`
-      + COLS.map(n=>by[n]?mk(by[n].n,by[n].m,by[n].v):'<td class="m na">·</td>').join('')
-      + `<td class="sj ${miss.length?(x.sn?'mid':'no'):'ok'}"><b>${x.sn}/${x.subs.length}</b> ${miss.length?`<span class="miss">남은 과목: ${miss.map(s=>`${esc(s.full)}${s.grp?'('+esc(s.grp)+')':''} <em>${esc(s.t)}</em>`).join(' · ')}</span>`:'<span class="okt">모두 입력 완료</span>'}</td></tr>`;
+      + COLS.map(n=>by[n]?mk(by[n]):'<td class="m na">·</td>').join('')
+      + `<td class="sj ${sAll?'ok':x.sv||x.sn?'mid':'no'}"><b>${x.sv}/${x.subs.length}</b> ${sAll?'<span class="okt">모두 나이스 확인 완료</span>':[x.sq?`<span class="sl rq">📩 수정 요청: ${SL('q')}</span>`:'', x.sw?`<span class="sl wt">🔵 확인 대기: ${SL('w')}</span>`:'', x.sn<x.subs.length?`<span class="sl miss">⏳ 체크 전: ${SL('x')}</span>`:''].join('')}</td></tr>`;
   });
   h += `</tbody></table>`;
   if(!L.length) h = gbar + `<div class="mini" style="padding:20px">조건에 맞는 반이 없어요.</div>`;
@@ -2256,11 +2265,11 @@ function dashClassDetail(gc){
   const wk = witakOf(x.h.g, x.h.c);
   const box = $('#dmodal .dbox');
   box.innerHTML = `<div class="dmh"><div><span class="mini">학급별 현황</span><h3>${gc}반 · 담임 ${esc(hrNm(x.h))}</h3></div><button class="btn sm" id="dx">닫기</button></div>
-    <h4 style="margin:8px 0 4px">🏫 담임 입력 <span class="mini">${x.hn}/${x.hm}</span></h4>
-    <ul class="dlist">${x.hr.map(c=>`<li class="${c.n===c.m?'y':''}"><span class="bx">${c.n===c.m?'✓':''}</span><span class="dlb"><b>${esc(c.card.label)}</b> ${esc(strip(c.card.title))}${c.left.length?`<br><span class="mini" style="color:var(--red)">남은 것: ${esc(c.left.join(' · '))}</span>`:''}</span><span class="tm">${c.n}/${c.m}${c.v?' · ✔ 확인':''}</span></li>`).join('')}</ul>
+    <h4 style="margin:8px 0 4px">🏫 담임 입력 <span class="mini">나이스 확인 ${x.hv}/${x.hm} · 선생님 체크 ${x.hn}/${x.hm}${x.hq?` · 📩 수정 요청 ${x.hq}`:''}</span></h4>
+    <ul class="dlist">${x.hr.map(c=>`<li class="${c.vn===c.m?'y':''}"><span class="bx">${c.vn===c.m?'✓':''}</span><span class="dlb"><b>${esc(c.card.label)}</b> ${esc(strip(c.card.title))}${c.req.length?`<br><span class="mini" style="color:#c2410c">📩 수정 요청 보냄: ${esc(c.req.join(' · '))}</span>`:''}${c.wait.length?`<br><span class="mini" style="color:#1f5fbf">🔵 확인 대기: ${esc(c.wait.join(' · '))}</span>`:''}${c.left.length?`<br><span class="mini" style="color:var(--red)">남은 것: ${esc(c.left.join(' · '))}</span>`:''}</span><span class="tm">${c.vn===c.m?'✔ 확인 완료':`확인 ${c.vn}/${c.m}`}</span></li>`).join('')}</ul>
     ${x.chk.length?`<h4 style="margin:12px 0 4px">🔎 점검 절차 <span class="mini">${x.cn}/${x.cm} · 입력이 아니라 따로 셌어요</span></h4><ul class="dlist">${x.chk.map(c=>`<li class="${c.n===c.m?'y':''}"><span class="bx">${c.n===c.m?'✓':''}</span><span class="dlb"><b>${esc(c.card.label)}</b> ${esc(strip(c.card.title))}</span><span class="tm">${c.n}/${c.m}</span></li>`).join('')}</ul>`:''}
-    <h4 style="margin:12px 0 4px">📘 2학기 교과 세특 <span class="mini">${x.sn}/${x.subs.length} · 그 반 수업에 들어가는 교과교사가 체크한 기준</span></h4>
-    <ul class="dlist">${x.subs.map(s=>`<li class="${s.on?'y':''}"><span class="bx">${s.on?'✓':''}</span><span class="dlb"><b>${esc(s.full)}</b>${s.full!==s.subj?` <span class="mini">(${esc(s.subj)})</span>`:''}${s.grp?` <span class="mini">${esc(s.grp)}</span>`:''} — ${esc(s.t)}</span><span class="tm">${s.on?fmt(s.tm):'아직'}</span>${s.on&&s.tk?`<button class="vbtn${s.v?' on':''}" data-tk="${esc(s.tk)}" data-cid="${s.cid}" data-k="${esc(sKey({subj:s.subj,g:x.h.g},s.cls))}">${s.v?'✔ 확인함':'나이스 확인'}</button>`:''}</li>`).join('')}
+    <h4 style="margin:12px 0 4px">📘 2학기 교과 세특 <span class="mini">나이스 확인 ${x.sv}/${x.subs.length} · 선생님 체크 ${x.sn}/${x.subs.length}${x.sq?` · 📩 수정 요청 ${x.sq}`:''}</span></h4>
+    <ul class="dlist">${x.subs.map(s=>`<li class="${s.on?'y':''}"><span class="bx">${s.on?'✓':''}</span><span class="dlb"><b>${esc(s.full)}</b>${s.full!==s.subj?` <span class="mini">(${esc(s.subj)})</span>`:''}${s.grp?` <span class="mini">${esc(s.grp)}</span>`:''} — ${esc(s.t)}</span><span class="tm">${s.q?'<b style="color:#c2410c">📩 요청함</b> ':''}${s.on?fmt(s.tm):'아직'}</span>${s.on&&s.tk?`<button class="vbtn${s.v?' on':''}" data-tk="${esc(s.tk)}" data-cid="${s.cid}" data-k="${esc(sKey({subj:s.subj,g:x.h.g},s.cls))}">${s.v?'✔ 확인함':'나이스 확인'}</button>`:''}</li>`).join('')}
     ${x.car.map(c=>`<li class="${c.on?'y':''}"><span class="bx">${c.on?'✓':''}</span><span class="dlb"><b>진로</b> ${esc(c.end)} ${esc(c.label)} — ${esc(c.t)}</span><span class="tm">${c.on?'':'아직'}</span></li>`).join('')}</ul>
     ${wk.length?`<div class="dmemo">위탁 학생: ${wk.map(w=>`${w.no}번 ${esc(w.nm)} (${w.w?'본교 성적 처리 → 세특 입력':'위탁교 성적 처리 → 세특 공백'})`).join(' · ')}</div>`:''}`;
   $('#dmodal').classList.remove('hidden');
@@ -2295,8 +2304,8 @@ function dashCsv(){
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`체크리스트_확인할일_${nowStr().replace(/[\/: ]/g,'')}.csv`; document.body.appendChild(a); a.click(); a.remove(); return;
   }
   if(DASH.tab==='c'){
-    const rows=[['반','담임','담임 체크','담임 남은 항목','교과 세특 체크','세특 미체크 과목(교사)']];
-    dashClassData().forEach(x=>rows.push([`${x.h.g}-${x.h.c}`, hrNm(x.h), `${x.hn}/${x.hm}`, x.hr.filter(c=>c.n<c.m).map(c=>`${c.card.label} ${dashShort(c.card.title)}: ${c.left.join('·')}`).join(' / '), `${x.sn}/${x.subs.length}`, x.subs.filter(s=>!s.on).map(s=>`${s.full}${s.grp?'('+s.grp+')':''}(${s.t})`).join(', ')]));
+    const rows=[['반','담임','담임 나이스 확인','담임 체크','담임 남은 항목','교과 나이스 확인','교과 체크','수정 요청 과목','확인 대기 과목','세특 미체크 과목(교사)']];
+    dashClassData().forEach(x=>rows.push([`${x.h.g}-${x.h.c}`, hrNm(x.h), `${x.hv}/${x.hm}`, `${x.hn}/${x.hm}`, x.hr.filter(c=>c.n<c.m).map(c=>`${c.card.label} ${dashShort(c.card.title)}: ${c.left.join('·')}`).join(' / '), `${x.sv}/${x.subs.length}`, `${x.sn}/${x.subs.length}`, x.subs.filter(s=>s.q).map(s=>`${s.full}(${s.t})`).join(', '), x.subs.filter(s=>s.st==='w').map(s=>`${s.full}(${s.t})`).join(', '), x.subs.filter(s=>!s.on).map(s=>`${s.full}${s.grp?'('+s.grp+')':''}(${s.t})`).join(', ')]));
     const csv = '\ufeff' + rows.map(r=>r.map(v=>{ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(',')).join('\r\n');
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`체크리스트_학급별현황_${nowStr().replace(/[\/: ]/g,'')}.csv`; document.body.appendChild(a); a.click(); a.remove(); return;
   }
