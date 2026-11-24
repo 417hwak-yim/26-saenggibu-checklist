@@ -1621,6 +1621,8 @@ const H_CARDS = [
  { id:'h1224', end:'12-24', label:'12/21~24', dow:'월~목', title:'진로 누가기록·이수시간 완료 · 생기부 최종 마무리',
    items:[
     {id:'a', car:1, sh:'진로 누가·이수 완료', t:'<b>진로활동 누가기록 100% 확인 · 이수시간</b> 반영 완료', s:'진로교사가 입력한 누가기록을 담임이 최종 확인하고 이수시간을 반영해요'},
+    {id:'m2', g:[2], cls:[1,2,3,4], t:'반 학생마다 <b>세부전공</b>이 <b>2학기</b>에 맞게 입력·기재됐는지 확인했어요', s:'2학기 세부전공은 12월 말에 입력돼요 → 입력된 뒤 확인 · [학적-기본학적관리-부전공/세부전공등록] · 빠졌거나 다른 세부전공이면 바로 고쳐요'},
+    {id:'m3', g:[3], cls:[1,2,3,4,5,6], t:'반 학생마다 <b>세부전공</b>이 <b>1학기·2학기</b> 모두 맞게 입력·기재됐는지 확인했어요', s:'2학기 세부전공은 12월 말에 입력돼요 → 입력된 뒤 확인 · [학적-기본학적관리-부전공/세부전공등록] · 빠졌거나 다른 세부전공이면 바로 고쳐요'},
     {id:'g3t', g:[3], t:'대입전형 자료 생성이 끝난 뒤 임원(학급자치회회장·부회장) 임기를 <b>2026.12.28.(졸업일)</b>로 고쳤어요', s:'11/30 자료 생성 때 2026.11.30.까지로 적어 둔 임기 → 마지막 임원의 임기 끝을 2026.12.28.로 수정'},
     {id:'c', t:'<b>최종 점검</b>(자료검증)·오류 보완 · <b>최종 학생부반영</b> 완료', s:'12/24(목) 생기부 최종 마무리'}],
    note:['<b>12/24(목)이 생기부 최종 마무리</b>예요. 12/25는 공휴일이에요.',
@@ -2581,7 +2583,7 @@ function keysOf(card){
   if(card.kind==='club') return (card.clubs||CLUBS[state.teacher]||[]).flatMap(cl=>card.items.map(i=>clubKey(i,cl)));
   return card.items.map(i=>i.id);
 }
-const itemsOf = card => (card.items||[]).filter(i=>!i.g || state.admin || i.g.includes(state.g));
+const itemsOf = card => (card.items||[]).filter(i=>(!i.g || state.admin || i.g.includes(state.g)) && (!i.cls || state.admin || i.cls.includes(+state.c)));
 const G3_NOTE = '<b style="color:var(--red)">3학년은 11/30(월) 기준으로 대입전형 자료가 만들어져서</b> 이 일정이 앞당겨졌어요.';
 const G3_OVR = {
   h1203:{end:'11-20', label:'11/20', dow:'금', n:'3학년 진로희망분야 · 행발 누가기록 2회는 <b>11/20(금)까지</b> 끝내요.'},
@@ -2843,7 +2845,7 @@ function bodyHtml(card){
     h += `<div class="sec">${(card.clubs||CLUBS[state.teacher]||[]).map((cl,ci)=>`<div class="grp">🎯 ${esc(cl)}${card.id!=='s1120c'&&CLUB3.has(cl)?' <span class="tag red">3학년 학생은 11/20 카드</span>':''}</div>`+card.items.map(i=>chkHtml(card.id,clubKey(i,cl),i.t,i.s)).join('')).join('')}</div>`;
   } else {
     if(card.vol) h += volHtml(card);
-    h += `<div class="sec"><h4>체크 항목</h4>${itemsOf(card).map(i=>chkHtml(card.id,i.id,(i.g?`<span class="tag gray">${i.g.join('·')}학년</span> `:'')+i.t,(i.gs&&!state.admin&&i.gs[state.g])||i.s,false,i.car)).join('')}</div>`;
+    h += `<div class="sec"><h4>체크 항목</h4>${itemsOf(card).map(i=>chkHtml(card.id,i.id,(i.g?`<span class="tag gray">${i.g.join('·')}학년${i.cls?' '+i.cls.join('·')+'반':''}</span> `:'')+i.t,(i.gs&&!state.admin&&i.gs[state.g])||i.s,false,i.car)).join('')}</div>`;
   }
   if(card.kind!=='seteuk' && card.note) h += `<div class="sec"><h4>기재 유의사항</h4><div class="note"><ul>${card.note.filter(x=>typeof x==='string' || state.admin || x.g.includes(state.g)).map(x=>`<li>${typeof x==='string'?x:(state.admin?`<span class="tag gray">${x.g.join('·')}학년</span> `:'')+x.t}</li>`).join('')}</ul></div></div>`;
   if(card.guide) h += `<div class="sec"><h4>이렇게 해요</h4><div class="guide">${card.guide}</div></div>`;
