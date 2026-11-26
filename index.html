@@ -2054,7 +2054,7 @@ async function dashLoad(){
     DASH.rows = {}; (j.rows||[]).forEach(r=>{ DASH.rows[r.key]={ data:r.data||{}, saved:r.saved }; });
     DASH.marks = Object.assign({}, j.marks||{}, ...Object.entries(DASH.pend).map(([k,v])=>({[k]:v})));
     DASH.at = nowStr(); $('#dst').textContent=`☁️ ${DASH.at} 불러옴`;
-    dashRender();
+    dashRender(); if(Object.keys(DASH.pend).length) dashFlush();   /* 지난번에 저장 못 한 확인 표시를 마저 보내요 */
   }catch(e){
     if(String(e.message)==='auth'){ try{ sessionStorage.removeItem('sgb:adminpw'); }catch(x){} toast('비밀번호를 다시 넣어 주세요.'); dashOpen(); return; }
     $('#dst').textContent='⚠️ 불러오지 못했어요'; if(!DASH.rows) $('#dtab').innerHTML=`<div class="mini" style="padding:20px">⚠️ 기록을 불러오지 못했어요. Apps Script를 새 버전으로 배포했는지 확인해 주세요. (${esc(e.message)})</div>`;
@@ -2288,13 +2288,19 @@ function dashToggle(tk, cid){
   DASH.marks[k] = { on, t:Date.now(), by:'담당자' }; DASH.pend[k] = DASH.marks[k];
   dashRender(); dashFlush();
 }
+/* 아직 시트에 저장되지 않은 확인 표시는 이 기기에도 적어 둬요 — 누르자마자 새로고침해도 사라지지 않게 (2026-11-26) */
+const PEND_KEY='sgb:dpend';
+function pendKeep(){ try{ const n=Object.keys(DASH.pend).length; if(n) localStorage.setItem(PEND_KEY, JSON.stringify(DASH.pend)); else localStorage.removeItem(PEND_KEY); }catch(e){} }
+try{ const o=JSON.parse(localStorage.getItem(PEND_KEY)||'{}'); if(o&&typeof o==='object') Object.assign(DASH.pend, o); }catch(e){}
+addEventListener('beforeunload', e=>{ if(Object.keys(DASH.pend).length){ pendKeep(); e.preventDefault(); e.returnValue=''; } });
 async function dashFlush(){
+  pendKeep();
   if(DASH.busy || !Object.keys(DASH.pend).length) return;
   DASH.busy = true; const send = Object.assign({}, DASH.pend);
   $('#dst').textContent='☁️ 확인 표시 저장 중…';
   try{
     const j = await dashCall({action:'verify', marks:send});
-    Object.keys(send).forEach(k=>{ if(DASH.pend[k]===send[k]) delete DASH.pend[k]; });
+    Object.keys(send).forEach(k=>{ if(DASH.pend[k]===send[k]) delete DASH.pend[k]; }); pendKeep();
     DASH.marks = Object.assign({}, j.marks||{}, DASH.pend);
     $('#dst').textContent=`☁️ 확인 표시 저장됨 ${nowStr()}`; dashRender();
   }catch(e){ $('#dst').textContent='⚠️ 확인 표시를 저장하지 못했어요. 잠시 뒤 다시 저장해요.'; setTimeout(dashFlush, 15000); }
